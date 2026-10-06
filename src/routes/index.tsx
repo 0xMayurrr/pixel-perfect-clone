@@ -266,7 +266,7 @@ function Metrics() {
         {METRICS.map((m, i) => (
           <div key={m.label} className={`reveal py-12 md:py-16 ${i ? "md:border-l" : ""} ${i % 2 ? "border-l md:border-l" : ""} border-border px-4 md:px-8`}>
             <div className="font-display text-6xl tracking-tight md:text-7xl">
-              <Counter value={m.value} suffix={m.suffix} decimals={m.decimals} />
+              <Counter value={m.value} suffix={m.suffix} decimals={m.decimals ?? 0} />
             </div>
             <p className="eyebrow mt-3 text-muted-foreground">{m.label}</p>
           </div>
