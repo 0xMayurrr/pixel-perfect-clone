@@ -421,7 +421,7 @@ function Testimonials() {
           <span className="text-primary">04</span> — In their words
         </div>
         <figure className="md:col-span-9">
-          <blockquote key={i} className="font-display text-4xl leading-[1.1] tracking-tight md:text-6xl" style={{ animation: "enter .7s ease" }}>
+          <blockquote key={i} className="animate-in fade-in slide-in-from-bottom-4 duration-700 font-display text-4xl leading-[1.1] tracking-tight md:text-6xl">
             <span className="text-primary">“</span>
             {t.quote}
             <span className="text-primary">”</span>
