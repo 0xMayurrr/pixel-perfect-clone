@@ -140,11 +140,9 @@
 }
 
 @utility img-reveal {
-  clip-path: inset(100% 0 0 0);
-  transition: clip-path 1.4s cubic-bezier(.7,0,.2,1);
-  & img { transform: scale(1.15); transition: transform 1.8s cubic-bezier(.2,.7,.2,1); }
-  &.is-in { clip-path: inset(0 0 0 0); }
-  &.is-in img { transform: scale(1); }
+  overflow: hidden;
+  & img { clip-path: inset(100% 0 0 0); transform: scale(1.15); transition: clip-path 1.4s cubic-bezier(.7,0,.2,1), transform 1.8s cubic-bezier(.2,.7,.2,1); }
+  &.is-in img { clip-path: inset(0 0 0 0); transform: scale(1); }
 }
 
 @utility link-line {
