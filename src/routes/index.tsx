@@ -29,7 +29,7 @@ export const Route = createFileRoute("/")({
 /* ---------- Editable content ---------- */
 const CLIENTS = ["Northwind", "Halcyon Dental", "Luxe Homes", "Arden & Co.", "FlowForge", "Meridian Clinics", "Oakline", "Vesper Legal"];
 
-const METRICS = [
+const METRICS: { value: number; suffix: string; label: string; decimals?: number }[] = [
   { value: 120, suffix: "+", label: "Clients served" },
   { value: 240, suffix: "+", label: "Projects delivered" },
   { value: 1.8, suffix: "M", label: "Leads generated", decimals: 1 },
@@ -121,7 +121,7 @@ function Counter({ value, suffix, decimals = 0 }: { value: number; suffix: strin
     const el = ref.current;
     if (!el) return;
     const io = new IntersectionObserver(([e]) => {
-      if (!e.isIntersecting) return;
+      if (!e?.isIntersecting) return;
       io.disconnect();
       const start = performance.now();
       const tick = (t: number) => {
@@ -413,7 +413,7 @@ function GrowthSystem() {
 
 function Testimonials() {
   const [i, setI] = useState(0);
-  const t = TESTIMONIALS[i];
+  const t = TESTIMONIALS[i]!;
   return (
     <section className="border-y border-border px-6 py-28 md:px-10 md:py-40">
       <div className="mx-auto grid max-w-[1400px] gap-10 md:grid-cols-12">
