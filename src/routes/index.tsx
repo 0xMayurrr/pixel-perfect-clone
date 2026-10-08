@@ -435,7 +435,7 @@ function FloatingScrollGlobe() {
         <div
           id="globe-wrapper"
           ref={globeContainerRef}
-          className="w-[400px] h-[400px] lg:w-[480px] lg:h-[480px] pointer-events-none lg:pointer-events-auto"
+          className="w-[300px] h-[300px] lg:w-[360px] lg:h-[360px] pointer-events-none lg:pointer-events-auto"
           style={{ willChange: "transform, opacity", transition: "opacity 0.3s ease" }}
         >
           <WebGLParticleGlobe explodeProgress={explodeVal} />
