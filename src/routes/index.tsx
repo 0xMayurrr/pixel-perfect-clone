@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 /* Real Photography Project Thumbnails */
 const CASE_THUMBS: Record<string, React.ReactNode> = {
@@ -487,9 +487,9 @@ function Nav() {
           <a href="#process" className="link-line hover:text-slate-900 transition-colors">Process</a>
           <a href="#profile" className="link-line hover:text-slate-900 transition-colors">Studio</a>
         </nav>
-        <a href="#contact" className="group inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-purple-600 hover:shadow-lg">
+        <Link to="/contact" className="group inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-purple-600 hover:shadow-lg">
           Start a project <Arrow className="transition-transform group-hover:rotate-45" />
-        </a>
+        </Link>
       </div>
     </header>
   );
@@ -721,9 +721,9 @@ function Hero() {
             <a href="#work" className="rounded-full bg-slate-900 text-white px-6 py-3.5 text-sm font-semibold transition-all hover:bg-purple-700 hover:shadow-lg hover:scale-105">
               Explore The Systems
             </a>
-            <a href="#contact" className="rounded-full border border-purple-300 bg-white px-6 py-3.5 text-sm font-semibold text-purple-900 transition-all hover:bg-purple-50 hover:border-purple-400 shadow-sm">
+            <Link to="/contact" className="rounded-full border border-purple-300 bg-white px-6 py-3.5 text-sm font-semibold text-purple-900 transition-all hover:bg-purple-50 hover:border-purple-400 shadow-sm">
               Initiate Project
-            </a>
+            </Link>
           </div>
           <MobileHeroGlobe />
         </div>
@@ -1236,13 +1236,13 @@ function CaseStudyModal({
 
         {/* Bottom CTA */}
         <div className="pt-6 border-t border-slate-200 flex flex-wrap items-center justify-between gap-4">
-          <a
-            href="#contact"
+          <Link
+            to="/contact"
             onClick={onClose}
             className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-8 py-3.5 text-sm font-semibold text-white transition-all hover:bg-purple-700 hover:shadow-lg cursor-pointer"
           >
             Deploy Similar System Architecture <Arrow />
-          </a>
+          </Link>
           <button
             onClick={onClose}
             className="text-xs font-mono text-slate-500 hover:text-slate-900 font-semibold underline underline-offset-4 transition-colors cursor-pointer"
@@ -1631,10 +1631,10 @@ function FinalCta() {
           </span>
         </h2>
         <div className="reveal mt-12 flex flex-wrap items-center justify-center gap-6">
-          <a href="mailto:hello@buildicy.com" className="group inline-flex items-center gap-3 rounded-full bg-white px-8 py-5 text-lg font-semibold text-slate-900 transition-all hover:bg-purple-600 hover:text-white shadow-lg hover:scale-105">
+          <Link to="/contact" className="group inline-flex items-center gap-3 rounded-full bg-white px-8 py-5 text-lg font-semibold text-slate-900 transition-all hover:bg-purple-600 hover:text-white shadow-lg hover:scale-105">
             Start a Conversation <Arrow className="transition-transform group-hover:rotate-45" />
-          </a>
-          <a href="mailto:hello@buildicy.com" className="link-line text-lg text-white/50 hover:text-white transition-colors">hello@buildicy.com</a>
+          </Link>
+          <a href="mailto:mayurr.buildicy@gmail.com" className="link-line text-lg text-white/50 hover:text-white transition-colors">mayurr.buildicy@gmail.com</a>
         </div>
       </div>
     </section>
