@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const CASE_THUMBS: Record<string, React.ReactNode> = {
   markeee: <img src="/thumbnails/markeee.jpg" alt="Markeee" className="w-full h-full object-cover object-center" loading="lazy" />,
@@ -35,35 +35,99 @@ function Arrow({ className = "" }: { className?: string }) {
 }
 
 function CaseStudyModal({ c, onClose, onOpenAudit }: { c: (typeof CASES)[number]; onClose: () => void; onOpenAudit: () => void }) {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [onClose]);
+
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-slate-900/40 backdrop-blur-md animate-in fade-in duration-300">
-      <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-[32px] bg-white border border-slate-200 p-6 md:p-10 text-slate-900 shadow-2xl no-scrollbar" onClick={(e) => e.stopPropagation()}>
-        <button onClick={onClose} className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white border border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all flex items-center justify-center text-lg font-bold cursor-pointer shadow-sm z-10" aria-label="Close modal">✕</button>
-        <div className="flex items-center gap-3 mb-3">
-          <span className="text-xs font-mono font-bold text-purple-700 bg-purple-50 border border-purple-200 px-3.5 py-1 rounded-full">{c.tag}</span>
-          <span className="text-xs font-mono text-slate-500">{c.year}</span>
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-3.5 sm:p-6 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-lg sm:max-w-2xl md:max-w-3xl max-h-[85dvh] sm:max-h-[88dvh] overflow-y-auto rounded-[24px] sm:rounded-[32px] bg-white border border-slate-200 p-5 sm:p-8 md:p-10 text-slate-900 shadow-2xl no-scrollbar overscroll-contain flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Top Header Row with Badges and Accessible Close Button */}
+        <div className="flex items-center justify-between gap-3 mb-2.5 shrink-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-[11px] sm:text-xs font-mono font-bold text-purple-700 bg-purple-50 border border-purple-200 px-3 py-1 rounded-full">
+              {c.tag}
+            </span>
+            <span className="text-[11px] sm:text-xs font-mono text-slate-500 font-medium">
+              {c.year}
+            </span>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-600 hover:text-slate-900 transition-colors flex items-center justify-center text-base sm:text-lg font-bold cursor-pointer shrink-0 shadow-2xs"
+            aria-label="Close modal"
+          >
+            ✕
+          </button>
         </div>
-        <h2 className="font-display text-3xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">{c.client}</h2>
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-[#080808] mb-6">
-          <div className="w-full max-h-[360px] overflow-hidden">{CASE_THUMBS[c.id]}</div>
+
+        {/* Client Title */}
+        <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-4 leading-tight">
+          {c.client}
+        </h2>
+
+        {/* Responsive Thumbnail Preview Banner */}
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-950 mb-5 relative aspect-[16/10] sm:aspect-[16/9] w-full shadow-inner shrink-0">
+          <div className="w-full h-full flex items-center justify-center">
+            {CASE_THUMBS[c.id]}
+          </div>
         </div>
-        <div className="mb-6 p-6 rounded-2xl bg-slate-50 border border-slate-200 shadow-sm">
-          <h3 className="text-xs font-mono font-bold text-purple-700 uppercase tracking-widest mb-2">System Capability</h3>
-          <p className="text-base text-slate-700 font-light leading-relaxed">{c.summary}</p>
+
+        {/* System Capability Highlight */}
+        <div className="mb-5 p-4 sm:p-5 rounded-2xl bg-purple-50/50 border border-purple-100/90 shadow-2xs">
+          <h3 className="text-[11px] sm:text-xs font-mono font-bold text-purple-700 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse" />
+            System Capability
+          </h3>
+          <p className="text-sm sm:text-base text-slate-700 font-light leading-relaxed">
+            {c.summary}
+          </p>
         </div>
+
+        {/* Engineered Stack */}
         <div className="mb-6">
-          <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-3">Engineered Stack</h3>
-          <div className="flex flex-wrap gap-2">
+          <h3 className="text-[11px] sm:text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-2.5">
+            Engineered Stack
+          </h3>
+          <div className="flex flex-wrap gap-1.5 sm:gap-2">
             {c.stack.map((s) => (
-              <span key={s} className="text-xs font-mono text-purple-700 bg-purple-50 border border-purple-100 shadow-sm px-3.5 py-1.5 rounded-xl">{s}</span>
+              <span
+                key={s}
+                className="text-[11px] sm:text-xs font-mono text-purple-700 bg-purple-50/80 border border-purple-200/70 shadow-2xs px-3 py-1.5 rounded-xl font-medium"
+              >
+                {s}
+              </span>
             ))}
           </div>
         </div>
-        <div className="pt-6 border-t border-slate-200 flex flex-wrap items-center justify-between gap-4">
-          <button onClick={onOpenAudit} className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-8 py-3.5 text-sm font-semibold text-white transition-all hover:bg-purple-700 hover:shadow-lg cursor-pointer">
+
+        {/* Footer Actions (Optimized for Mobile Touch) */}
+        <div className="mt-auto pt-4 sm:pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shrink-0">
+          <button
+            onClick={onOpenAudit}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 hover:bg-purple-700 active:scale-[0.98] px-7 py-3.5 text-sm font-semibold text-white shadow-md hover:shadow-lg transition-all cursor-pointer"
+          >
             Deploy Similar System <Arrow />
           </button>
-          <button onClick={onClose} className="text-xs font-mono text-slate-500 hover:text-slate-900 font-semibold underline underline-offset-4 transition-colors cursor-pointer">Close</button>
+          <button
+            onClick={onClose}
+            className="w-full sm:w-auto px-6 py-2.5 sm:py-2 rounded-full border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100 active:bg-slate-200 text-xs font-mono font-semibold transition-all text-center cursor-pointer"
+          >
+            Close
+          </button>
         </div>
       </div>
     </div>
@@ -72,16 +136,32 @@ function CaseStudyModal({ c, onClose, onOpenAudit }: { c: (typeof CASES)[number]
 
 function Card({ c, className = "", onSelect }: { c: (typeof CASES)[number]; className?: string; onSelect: () => void }) {
   return (
-    <article onClick={onSelect} className={`group relative overflow-hidden bg-slate-200 cursor-pointer ${className}`}>
-      <div className="absolute inset-0">{CASE_THUMBS[c.id]}</div>
-      <div className="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/55 transition-all duration-300" />
-      <div className="absolute inset-x-0 bottom-0 p-4 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-        <p className="text-[9px] font-mono text-purple-300 font-semibold uppercase tracking-widest mb-0.5">{c.tag}</p>
-        <h3 className="font-display text-base font-extrabold text-white leading-tight">{c.client}</h3>
-        <p className="text-[10px] font-mono text-white/60 mt-0.5">{c.year} · {c.stack[0]}</p>
+    <article
+      onClick={onSelect}
+      className={`group relative overflow-hidden bg-slate-900 cursor-pointer select-none active:scale-[0.99] transition-transform ${className}`}
+    >
+      <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-105">
+        {CASE_THUMBS[c.id]}
       </div>
-      <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-white/0 group-hover:bg-white/15 border border-white/0 group-hover:border-white/30 flex items-center justify-center transition-all duration-300">
-        <Arrow className="text-white/0 group-hover:text-white transition-colors duration-300 w-3 h-3" />
+      {/* Bottom gradient on mobile keeps client name legible without needing hover; darker hover on desktop */}
+      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/25 to-transparent sm:bg-none sm:group-hover:bg-slate-950/60 transition-all duration-300" />
+      
+      {/* Details: visible on mobile, reveals on desktop hover */}
+      <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4 translate-y-0 opacity-100 sm:translate-y-2 sm:opacity-0 sm:group-hover:translate-y-0 sm:group-hover:opacity-100 transition-all duration-300">
+        <p className="text-[9px] font-mono text-purple-300 font-semibold uppercase tracking-widest mb-0.5">
+          {c.tag}
+        </p>
+        <h3 className="font-display text-sm sm:text-base font-extrabold text-white leading-tight">
+          {c.client}
+        </h3>
+        <p className="text-[10px] font-mono text-white/75 mt-0.5">
+          {c.year} · {c.stack[0]}
+        </p>
+      </div>
+
+      {/* Floating Arrow Badge: visible on mobile, styled cleanly */}
+      <div className="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 w-7 h-7 rounded-full bg-black/40 sm:bg-white/0 sm:group-hover:bg-white/20 border border-white/20 sm:border-white/0 sm:group-hover:border-white/30 flex items-center justify-center transition-all duration-300 backdrop-blur-xs">
+        <Arrow className="text-white sm:text-white/0 sm:group-hover:text-white transition-colors duration-300 w-3 h-3" />
       </div>
     </article>
   );
@@ -138,7 +218,7 @@ export function Work({ onOpenAudit }: { onOpenAudit: () => void }) {
               key={i}
               onClick={() => setActivePage(i)}
               aria-label={`Page ${i + 1}`}
-              className={`rounded-full transition-all duration-300 ${activePage === i ? "w-5 h-2 bg-slate-900" : "w-2 h-2 bg-slate-300 hover:bg-slate-500"}`}
+              className={`rounded-full transition-all duration-300 cursor-pointer ${activePage === i ? "w-5 h-2 bg-slate-900" : "w-2 h-2 bg-slate-300 hover:bg-slate-500"}`}
             />
           ))}
         </div>
@@ -146,7 +226,7 @@ export function Work({ onOpenAudit }: { onOpenAudit: () => void }) {
           <button
             onClick={() => setActivePage((p) => Math.max(0, p - 1))}
             disabled={activePage === 0}
-            className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-500 hover:border-slate-900 hover:text-slate-900 disabled:opacity-30 transition-all"
+            className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-500 hover:border-slate-900 hover:text-slate-900 disabled:opacity-30 transition-all cursor-pointer"
             aria-label="Previous"
           >
             <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M19 12H5M10 7l-5 5 5 5" /></svg>
@@ -155,7 +235,7 @@ export function Work({ onOpenAudit }: { onOpenAudit: () => void }) {
           <button
             onClick={() => setActivePage((p) => Math.min(PAGES.length - 1, p + 1))}
             disabled={activePage === PAGES.length - 1}
-            className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-500 hover:border-slate-900 hover:text-slate-900 disabled:opacity-30 transition-all"
+            className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-500 hover:border-slate-900 hover:text-slate-900 disabled:opacity-30 transition-all cursor-pointer"
             aria-label="Next"
           >
             <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M5 12h14M14 7l5 5-5 5" /></svg>
@@ -173,3 +253,4 @@ export function Work({ onOpenAudit }: { onOpenAudit: () => void }) {
     </section>
   );
 }
+

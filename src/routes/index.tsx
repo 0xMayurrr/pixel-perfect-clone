@@ -88,13 +88,32 @@ function useReveal() {
         .forEach((el) => observer.observe(el));
     };
     observeAll();
-    const mo = new MutationObserver(() => observeAll());
+    let moRaf: number | null = null;
+    const mo = new MutationObserver(() => {
+      if (moRaf) return;
+      moRaf = requestAnimationFrame(() => {
+        observeAll();
+        moRaf = null;
+      });
+    });
     mo.observe(document.body, { childList: true, subtree: true });
     return () => {
       observer.disconnect();
       mo.disconnect();
+      if (moRaf) cancelAnimationFrame(moRaf);
     };
   }, []);
+}
+
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const check = () => setIsDesktop(window.innerWidth >= 1024);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+  return isDesktop;
 }
 
 function Counter({ value, suffix, prefix = "", decimals = 0 }: { value: number; suffix: string; prefix?: string; decimals?: number }) {
@@ -123,7 +142,7 @@ function Arrow({ className = "" }: { className?: string }) {
 
 function MobileHeroGlobe() {
   return (
-    <div className="lg:hidden w-full flex justify-center mt-10 mb-2">
+    <div className="lg:hidden w-full flex justify-center mt-8 mb-2">
       <div className="w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] relative">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(168,85,247,0.22)_0%,transparent_70%)] rounded-full" />
         <WebGLParticleGlobe />
@@ -168,6 +187,16 @@ function WebGLParticleGlobe() {
     let animId: number;
     let cancelled = false;
     let cleanup: (() => void) | undefined;
+    let isVisible = true;
+
+    // Pause WebGL rendering loop when scrolled off-screen to save 100% of mobile CPU/GPU
+    const visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry?.isIntersecting ?? false;
+      },
+      { threshold: 0.02 }
+    );
+    visibilityObserver.observe(container);
 
     while (container.firstChild) container.removeChild(container.firstChild);
 
@@ -183,15 +212,20 @@ function WebGLParticleGlobe() {
 
           (window as any).THREE = THREE;
 
+          const isMobile = window.innerWidth < 768;
           const width = container.clientWidth || 360;
           const height = container.clientHeight || 360;
           const scene = new THREE.Scene();
           const camera = new THREE.PerspectiveCamera(50, width / height, 1, 2000);
           camera.position.set(0, 0, 310);
 
-          const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+          const renderer = new THREE.WebGLRenderer({
+            antialias: !isMobile,
+            alpha: true,
+            powerPreference: "high-performance",
+          });
           renderer.setSize(width, height);
-          renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+          renderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio, 1.5));
           renderer.setClearColor(0x000000, 0);
           container.appendChild(renderer.domElement);
 
@@ -255,7 +289,7 @@ function WebGLParticleGlobe() {
               if (countries?.features) {
                 globe
                   .hexPolygonsData(countries.features)
-                  .hexPolygonResolution(3)
+                  .hexPolygonResolution(isMobile ? 2 : 3)
                   .hexPolygonMargin(0.35)
                   .hexPolygonAltitude(0.005)
                   .hexPolygonColor(() => "rgba(255,255,255,0.92)");
@@ -301,6 +335,7 @@ function WebGLParticleGlobe() {
 
           function animate() {
             animId = requestAnimationFrame(animate);
+            if (!isVisible) return; // Skip rendering when off-screen!
             t += 0.007;
             globe.rotation.y = userRotY + t;
             globe.rotation.x = userRotX + Math.sin(t * 0.35) * 0.1;
@@ -318,6 +353,7 @@ function WebGLParticleGlobe() {
           window.addEventListener("resize", handleResize);
 
           cleanup = () => {
+            visibilityObserver.disconnect();
             cancelAnimationFrame(animId);
             container.removeEventListener("pointerdown", onPointerDown);
             window.removeEventListener("pointermove", onPointerMove);
@@ -339,6 +375,7 @@ function WebGLParticleGlobe() {
 
     return () => {
       cancelled = true;
+      visibilityObserver.disconnect();
       cleanup?.();
       cancelAnimationFrame(animId);
     };
@@ -406,6 +443,8 @@ function Nav({ onOpenAudit }: { onOpenAudit: () => void }) {
 }
 
 function Hero({ onOpenAudit }: { onOpenAudit: () => void }) {
+  const isDesktop = useIsDesktop();
+
   return (
     <section id="top" className="relative min-h-[92vh] w-full bg-[#faf8f5] text-slate-900 flex flex-col justify-center overflow-hidden px-6 pt-36 pb-20 md:px-12 lg:px-16">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(168,85,247,0.10)_0%,rgba(99,102,241,0.03)_40%,#faf8f5_75%)] pointer-events-none" />
@@ -422,11 +461,11 @@ function Hero({ onOpenAudit }: { onOpenAudit: () => void }) {
             <button onClick={onOpenAudit} className="rounded-full bg-purple-600 text-white px-7 py-4 text-sm font-semibold transition-all hover:bg-purple-700 hover:shadow-lg hover:scale-105 shadow-md shadow-purple-600/20 cursor-pointer">Book Free AI Growth Audit</button>
             <a href="#systems" className="rounded-full border border-slate-300 bg-white px-6 py-4 text-sm font-semibold text-slate-800 transition-all hover:bg-purple-50 hover:border-purple-300 shadow-2xs">View Our Systems</a>
           </div>
-          <MobileHeroGlobe />
+          {!isDesktop && <MobileHeroGlobe />}
         </div>
         <div className="lg:col-span-4 order-2 hidden lg:flex items-center justify-center min-h-[480px] relative pointer-events-auto">
           <div className="w-[340px] h-[340px] xl:w-[420px] xl:h-[420px] relative flex items-center justify-center">
-            <WebGLParticleGlobe />
+            {isDesktop && <WebGLParticleGlobe />}
           </div>
         </div>
       </div>
@@ -459,13 +498,15 @@ const SERVICE_ICONS = [
 ];
 
 function Services() {
+  const isDesktop = useIsDesktop();
+
   return (
     <section id="services" className="px-6 py-16 md:px-10 md:py-36 bg-[#faf8f5] text-slate-900 border-t border-slate-200">
       <div className="mx-auto max-w-[1400px]">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
           <div className="lg:col-span-5 order-1 hidden lg:flex items-center justify-center min-h-[480px] relative pointer-events-auto">
             <div className="w-[320px] h-[320px] xl:w-[420px] xl:h-[420px] relative flex items-center justify-center sticky top-32">
-              <WebGLParticleGlobe />
+              {isDesktop && <WebGLParticleGlobe />}
             </div>
           </div>
           <div className="lg:col-span-7 order-2">
@@ -816,7 +857,9 @@ function AuditBookingModal({ initialPackage, initialMarket, onClose }: { initial
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, [onClose]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -841,9 +884,9 @@ function AuditBookingModal({ initialPackage, initialMarket, onClose }: { initial
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-slate-900/50 backdrop-blur-md animate-in fade-in duration-200" onClick={onClose}>
-      <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-3xl bg-white border border-slate-200 p-6 sm:p-10 text-slate-900 shadow-2xl no-scrollbar" onClick={(e) => e.stopPropagation()}>
-        <button onClick={onClose} className="absolute top-6 right-6 w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-colors cursor-pointer text-sm font-bold" aria-label="Close modal">✕</button>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3.5 sm:p-6 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200" onClick={onClose}>
+      <div className="relative w-full sm:max-w-lg max-h-[85dvh] sm:max-h-[88dvh] overflow-y-auto rounded-[24px] sm:rounded-3xl bg-white border border-slate-200 p-5 sm:p-8 md:p-10 text-slate-900 shadow-2xl no-scrollbar overscroll-contain flex flex-col" onClick={(e) => e.stopPropagation()}>
+        <button onClick={onClose} className="absolute top-5 right-5 sm:top-6 sm:right-6 w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-colors cursor-pointer text-sm font-bold shadow-2xs z-10" aria-label="Close modal">✕</button>
         {isSubmitted ? (
           <div className="text-center py-6">
             <div className="w-14 h-14 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto mb-4 text-2xl font-bold">✓</div>
@@ -856,24 +899,24 @@ function AuditBookingModal({ initialPackage, initialMarket, onClose }: { initial
           </div>
         ) : (
           <div>
-            <div className="mb-6">
+            <div className="mb-5 pr-10">
               <span className="text-[10px] font-mono font-bold text-purple-700 bg-purple-50 border border-purple-200 px-3 py-1 rounded-full uppercase tracking-wider inline-block mb-2">Free 30-Minute Session</span>
-              <h3 className="font-display text-2xl sm:text-3xl font-extrabold text-slate-900">Book Free AI Growth Audit</h3>
+              <h3 className="font-display text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight">Book Free AI Growth Audit</h3>
               <p className="text-xs sm:text-sm text-slate-500 mt-1 font-light">We'll review your lead flow, follow-up gaps, and recommend the right AI system for your business.</p>
             </div>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div><label className="block text-xs font-mono text-slate-600 mb-1">Your Name *</label><input type="text" required value={name} onChange={(e) => setName(e.target.value)} placeholder="Rahul Sharma" className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-purple-600 focus:bg-white" /></div>
-                <div><label className="block text-xs font-mono text-slate-600 mb-1">Business Name</label><input type="text" value={businessName} onChange={(e) => setBusinessName(e.target.value)} placeholder="Company Name" className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-purple-600 focus:bg-white" /></div>
+            <form onSubmit={handleSubmit} className="space-y-3.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div><label className="block text-xs font-mono text-slate-600 mb-1">Your Name *</label><input type="text" required value={name} onChange={(e) => setName(e.target.value)} placeholder="Rahul Sharma" className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-purple-600 focus:bg-white" /></div>
+                <div><label className="block text-xs font-mono text-slate-600 mb-1">Business Name</label><input type="text" value={businessName} onChange={(e) => setBusinessName(e.target.value)} placeholder="Company Name" className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-purple-600 focus:bg-white" /></div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div><label className="block text-xs font-mono text-slate-600 mb-1">Work Email *</label><input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@company.com" className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-purple-600 focus:bg-white" /></div>
-                <div><label className="block text-xs font-mono text-slate-600 mb-1">WhatsApp / Phone *</label><input type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 98765 43210" className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-purple-600 focus:bg-white" /></div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div><label className="block text-xs font-mono text-slate-600 mb-1">Work Email *</label><input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@company.com" className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-purple-600 focus:bg-white" /></div>
+                <div><label className="block text-xs font-mono text-slate-600 mb-1">WhatsApp / Phone *</label><input type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 98765 43210" className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-purple-600 focus:bg-white" /></div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-mono text-slate-600 mb-1">System / Service Interest</label>
-                  <select value={serviceNeeded} onChange={(e) => setServiceNeeded(e.target.value)} className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-purple-600 focus:bg-white">
+                  <select value={serviceNeeded} onChange={(e) => setServiceNeeded(e.target.value)} className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-base sm:text-sm text-slate-900 focus:outline-none focus:border-purple-600 focus:bg-white">
                     <optgroup label="Individual Services">
                       <option value="AI Funnel System">AI Funnel System</option>
                       <option value="AI Receptionist">AI Receptionist</option>
@@ -889,10 +932,10 @@ function AuditBookingModal({ initialPackage, initialMarket, onClose }: { initial
                     </optgroup>
                   </select>
                 </div>
-                <div><label className="block text-xs font-mono text-slate-600 mb-1">Market</label><select value={market} onChange={(e) => setMarket(e.target.value)} className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-purple-600 focus:bg-white"><option value="India — INR">India (INR)</option><option value="International — USD">Intl (USD)</option></select></div>
+                <div><label className="block text-xs font-mono text-slate-600 mb-1">Market</label><select value={market} onChange={(e) => setMarket(e.target.value)} className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-base sm:text-sm text-slate-900 focus:outline-none focus:border-purple-600 focus:bg-white"><option value="India — INR">India (INR)</option><option value="International — USD">Intl (USD)</option></select></div>
               </div>
-              <div><label className="block text-xs font-mono text-slate-600 mb-1">Current Revenue Leak / Goal (Optional)</label><textarea rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="e.g. Missing inbound customer calls, slow WhatsApp response, manual CRM work..." className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-purple-600 focus:bg-white resize-none" /></div>
-              <div className="pt-2"><button type="submit" disabled={isSubmitting} className="w-full rounded-full bg-slate-900 hover:bg-purple-600 py-3.5 text-sm font-semibold text-white shadow-md transition-all cursor-pointer disabled:opacity-50">{isSubmitting ? "Dispatching Request..." : "Confirm Free AI Growth Audit"}</button></div>
+              <div><label className="block text-xs font-mono text-slate-600 mb-1">Current Revenue Leak / Goal (Optional)</label><textarea rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="e.g. Missing inbound customer calls, slow WhatsApp response, manual CRM work..." className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-purple-600 focus:bg-white resize-none" /></div>
+              <div className="pt-2"><button type="submit" disabled={isSubmitting} className="w-full rounded-full bg-slate-900 hover:bg-purple-600 active:scale-[0.98] py-3.5 text-sm font-semibold text-white shadow-md transition-all cursor-pointer disabled:opacity-50">{isSubmitting ? "Dispatching Request..." : "Confirm Free AI Growth Audit"}</button></div>
               <p className="text-[11px] font-mono text-slate-400 text-center">100% Free • Direct strategy session with Buildicy</p>
             </form>
           </div>
