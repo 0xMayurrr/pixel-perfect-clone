@@ -1,256 +1,421 @@
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
+import { ArrowUpRight, X, CheckCircle2 } from "lucide-react";
 
-const CASE_THUMBS: Record<string, React.ReactNode> = {
-  markeee: <img src="/thumbnails/markeee.jpg" alt="Markeee" className="w-full h-full object-cover object-center" loading="lazy" />,
-  bizbrain: <img src="/thumbnails/bizbrain.jpg" alt="BizBrain" className="w-full h-full object-cover object-center" loading="lazy" />,
-  growzo: <img src="/thumbnails/growzo.jpg" alt="GrowZO" className="w-full h-full object-cover object-center" loading="lazy" />,
-  vibestay: <img src="/thumbnails/vibestay.jpg" alt="VibeStay" className="w-full h-full object-cover object-center" loading="lazy" />,
-  "campus-aid-buddy": <img src="/thumbnails/campus-aid-buddy.jpg" alt="Campus Aid Buddy" className="w-full h-full object-cover object-center" loading="lazy" />,
-  "tuition-os": <img src="/thumbnails/tuition-os.jpg" alt="Tuition OS" className="w-full h-full object-cover object-center" loading="lazy" />,
-  "clientsync-os": <img src="/thumbnails/clientsync-os.jpg" alt="ClientSync OS" className="w-full h-full object-cover object-center" loading="lazy" />,
-  kindred: <img src="/thumbnails/kindred.jpg" alt="Kindred" className="w-full h-full object-cover object-center" loading="lazy" />,
-  "rs-technologies": <img src="/thumbnails/rs-technologies.jpg" alt="RS Technologies" className="w-full h-full object-cover object-center" loading="lazy" />,
-};
+interface WorkSystem {
+  id: string;
+  name: string;
+  label: string;
+  category: string;
+  badge: string;
+  year: string;
+  description: string;
+  outcome: string;
+  image: string;
+}
 
-const CASES = [
-  { id: "markeee", client: "Markeee", tag: "AI Marketing System", year: "2025", summary: "Automated lead generation, marketing workflows, and conversion landing pages.", stack: ["AI Workflow Engine", "Lead Capture", "Campaign Automation"] },
-  { id: "bizbrain", client: "BizBrain", tag: "AI CRM System", year: "2025", summary: "Unified customer management, sales pipeline tracking, and business process automation.", stack: ["CRM Engine", "Sales Automation", "Pipeline Intelligence"] },
-  { id: "growzo", client: "GrowZO", tag: "AI Calling Agent", year: "2025", summary: "Autonomous AI voice agent handling outbound sales calls and natural conversations.", stack: ["Voice AI", "Autonomous Outbound", "Speech Synthesis"] },
-  { id: "vibestay", client: "VibeStay", tag: "Hospitality Platform", year: "2025", summary: "Modern booking engine and digital guest experience management platform.", stack: ["React", "Hospitality API", "Booking Architecture"] },
-  { id: "campus-aid-buddy", client: "Campus Aid Buddy", tag: "Campus Support Platform", year: "2024", summary: "Centralized student academic resources, campus support, and activity portal.", stack: ["Portal Architecture", "Resource Management", "API Services"] },
-  { id: "tuition-os", client: "Tuition OS", tag: "Education Operations", year: "2024", summary: "Centralized tuition centre management, student tracking, and automated administrative operations.", stack: ["SaaS Architecture", "Student Records", "Admin Workflows"] },
-  { id: "clientsync-os", client: "ClientSync OS", tag: "Client Management", year: "2024", summary: "Client management OS with centralized communications and workflow coordination.", stack: ["Client Portal", "Workflow Coordination", "Data Hub"] },
-  { id: "kindred", client: "Kindred", tag: "Community Platform", year: "2024", summary: "Modern digital community platform with personalized interaction flows and engagement tools.", stack: ["Community Engine", "Real-Time Interaction", "UX Design"] },
-  { id: "rs-technologies", client: "RS Technologies", tag: "Business Website", year: "2024", summary: "Modern corporate digital web platform showcasing technology services and enterprise capabilities.", stack: ["Modern Web Architecture", "Brand Identity", "Interactive UI"] },
+const PAGES: WorkSystem[][] = [
+  // Page 1 (1 / 3)
+  [
+    {
+      id: "markeee",
+      name: "MARKEEE",
+      label: "Markeee",
+      category: "AI Marketing Automation",
+      badge: "SaaS",
+      year: "2025",
+      description: "Unified AI marketing platform with automated workflows, lead management and campaign automation.",
+      outcome: "3× faster lead response",
+      image: "/thumbnails/markeee.jpg",
+    },
+    {
+      id: "bizbrain",
+      name: "BIZBRAIN",
+      label: "BizBrain",
+      category: "AI CRM Platform",
+      badge: "SaaS",
+      year: "2025",
+      description: "Centralized AI CRM that unifies customer management, sales workflows and business operations.",
+      outcome: "−60% manual CRM work",
+      image: "/thumbnails/bizbrain.jpg",
+    },
+    {
+      id: "growzo",
+      name: "GROWZO",
+      label: "GrowZO",
+      category: "AI Cold Calling & Sales",
+      badge: "AI Voice",
+      year: "2025",
+      description: "Autonomous AI voice agent that handles outbound cold calls, qualifications, and live bookings 24/7.",
+      outcome: "10× outreach volume • −80% manual sales effort",
+      image: "/thumbnails/growzo.jpg",
+    },
+  ],
+  // Page 2 (2 / 3)
+  [
+    {
+      id: "vibestay",
+      name: "VIBESTAY",
+      label: "VibeStay",
+      category: "Hospitality Platform",
+      badge: "Platform",
+      year: "2025",
+      description: "Modern hospitality platform for discovering and booking boutique accommodation experiences.",
+      outcome: "+65% user engagement",
+      image: "/thumbnails/vibestay.jpg",
+    },
+    {
+      id: "campus-aid-buddy",
+      name: "CAMPUS AID BUDDY",
+      label: "Campus Aid Buddy",
+      category: "Student Campus Hub",
+      badge: "Platform",
+      year: "2024",
+      description: "Centralized hub for college students covering academic resources, campus activities and automated student support.",
+      outcome: "+70% resource accessibility",
+      image: "/thumbnails/campus-aid-buddy.jpg",
+    },
+    {
+      id: "tuition-os",
+      name: "TUITION OS",
+      label: "Tuition OS",
+      category: "Education SaaS",
+      badge: "SaaS",
+      year: "2024",
+      description: "Comprehensive SaaS platform for tuition centres to manage students, attendance, fee collections, and administrative workflows.",
+      outcome: "−65% admin manual work",
+      image: "/thumbnails/tuition-os.jpg",
+    },
+  ],
+  // Page 3 (3 / 3)
+  [
+    {
+      id: "clientsync-os",
+      name: "CLIENTSYNC OS",
+      label: "ClientSync OS",
+      category: "Client Management OS",
+      badge: "SaaS",
+      year: "2024",
+      description: "Unified client management OS with real-time communication, workflow coordination and milestone tracking.",
+      outcome: "−50% fragmented workflows",
+      image: "/thumbnails/clientsync-os.jpg",
+    },
+    {
+      id: "kindred",
+      name: "KINDRED",
+      label: "Kindred",
+      category: "Community Platform",
+      badge: "Platform",
+      year: "2024",
+      description: "Modern community engagement platform featuring personalized interaction feeds and seamless UX.",
+      outcome: "+80% user retention",
+      image: "/thumbnails/kindred.jpg",
+    },
+    {
+      id: "rs-technologies",
+      name: "RS TECHNOLOGIES",
+      label: "RS Technologies",
+      category: "Technology Website",
+      badge: "Platform",
+      year: "2024",
+      description: "Professional business website with clear capability showcase, brand identity and enterprise inquiry routing.",
+      outcome: "+90% online credibility",
+      image: "/thumbnails/rs-technologies.jpg",
+    },
+  ],
 ];
 
-const PAGES = [CASES.slice(0, 3), CASES.slice(3, 6), CASES.slice(6, 9)];
+export function Work({ onOpenAudit }: { onOpenAudit?: (pkgName?: string) => void }) {
+  const [currentPage, setCurrentPage] = useState(0);
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+  const [selectedProject, setSelectedProject] = useState<WorkSystem | null>(null);
+  const [isClient, setIsClient] = useState(false);
+  const trackRef = useRef<HTMLDivElement>(null);
 
-function Arrow({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={`h-4 w-4 ${className}`} fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
-      <path d="M5 19 19 5M8 5h11v11" />
-    </svg>
-  );
-}
-
-function CaseStudyModal({ c, onClose, onOpenAudit }: { c: (typeof CASES)[number]; onClose: () => void; onOpenAudit: () => void }) {
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [onClose]);
+    setIsClient(true);
+  }, []);
+
+  // Lock body scroll and handle Escape key when project preview modal is open
+  useEffect(() => {
+    if (selectedProject) {
+      const orig = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Escape") setSelectedProject(null);
+      };
+      window.addEventListener("keydown", handleKeyDown);
+      return () => {
+        document.body.style.overflow = orig;
+        window.removeEventListener("keydown", handleKeyDown);
+      };
+    }
+  }, [selectedProject]);
+
+  const currentSystems: WorkSystem[] = PAGES[currentPage] ?? (PAGES[0] as WorkSystem[]);
+  const activeSystem: WorkSystem =
+    (hoveredIdx !== null ? currentSystems[hoveredIdx] : currentSystems[0]) ??
+    (currentSystems[0] as WorkSystem);
+
+  const handlePrev = () => {
+    setCurrentPage((p) => (p > 0 ? p - 1 : PAGES.length - 1));
+    setHoveredIdx(null);
+    if (trackRef.current) {
+      trackRef.current.scrollTo({ left: 0, behavior: "smooth" });
+    }
+  };
+
+  const handleNext = () => {
+    setCurrentPage((p) => (p < PAGES.length - 1 ? p + 1 : 0));
+    setHoveredIdx(null);
+    if (trackRef.current) {
+      trackRef.current.scrollTo({ left: 0, behavior: "smooth" });
+    }
+  };
+
+  const goToPage = (pageIdx: number) => {
+    setCurrentPage(pageIdx);
+    setHoveredIdx(null);
+    if (trackRef.current) {
+      trackRef.current.scrollTo({ left: 0, behavior: "smooth" });
+    }
+  };
+
+  const handleTrackScroll = () => {
+    if (!trackRef.current) return;
+    const scrollLeft = trackRef.current.scrollLeft;
+    const cardWidth = trackRef.current.firstElementChild?.clientWidth || 280;
+    const newIdx = Math.round(scrollLeft / (cardWidth + 14));
+    const safeIdx = Math.max(0, Math.min(newIdx, currentSystems.length - 1));
+    setHoveredIdx(safeIdx);
+  };
 
   return (
-    <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-3.5 sm:p-6 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200"
-      onClick={onClose}
+    <section
+      id="systems"
+      className="relative z-10 px-5 sm:px-6 py-16 sm:py-20 md:px-10 md:py-32 bg-[#faf8f5] text-slate-900 border-t border-slate-200 overflow-hidden"
     >
-      <div
-        className="relative w-full max-w-lg sm:max-w-2xl md:max-w-3xl max-h-[85dvh] sm:max-h-[88dvh] overflow-y-auto rounded-[24px] sm:rounded-[32px] bg-white border border-slate-200 p-5 sm:p-8 md:p-10 text-slate-900 shadow-2xl no-scrollbar overscroll-contain flex flex-col"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Top Header Row with Badges and Accessible Close Button */}
-        <div className="flex items-center justify-between gap-3 mb-2.5 shrink-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[11px] sm:text-xs font-mono font-bold text-purple-700 bg-purple-50 border border-purple-200 px-3 py-1 rounded-full">
-              {c.tag}
+      <div className="mx-auto max-w-[1400px]">
+        {/* Header Block matching reference */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-5 mb-8 sm:mb-10 md:mb-14">
+          {/* Left Title */}
+          <div>
+            <span className="text-[11px] font-mono uppercase tracking-[0.22em] text-purple-700 font-bold block mb-2 sm:mb-3">
+              ARCHITECTURE
             </span>
-            <span className="text-[11px] sm:text-xs font-mono text-slate-500 font-medium">
-              {c.year}
-            </span>
+            <h2 className="font-display text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight text-slate-900 leading-[0.98]">
+              Founder-built
+              <br />
+              work.
+            </h2>
           </div>
 
-          <button
-            onClick={onClose}
-            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-600 hover:text-slate-900 transition-colors flex items-center justify-center text-base sm:text-lg font-bold cursor-pointer shrink-0 shadow-2xs"
-            aria-label="Close modal"
-          >
-            ✕
-          </button>
-        </div>
-
-        {/* Client Title */}
-        <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-4 leading-tight">
-          {c.client}
-        </h2>
-
-        {/* Responsive Thumbnail Preview Banner */}
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-950 mb-5 relative aspect-[16/10] sm:aspect-[16/9] w-full shadow-inner shrink-0">
-          <div className="w-full h-full flex items-center justify-center">
-            {CASE_THUMBS[c.id]}
-          </div>
-        </div>
-
-        {/* System Capability Highlight */}
-        <div className="mb-5 p-4 sm:p-5 rounded-2xl bg-purple-50/50 border border-purple-100/90 shadow-2xs">
-          <h3 className="text-[11px] sm:text-xs font-mono font-bold text-purple-700 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse" />
-            System Capability
-          </h3>
-          <p className="text-sm sm:text-base text-slate-700 font-light leading-relaxed">
-            {c.summary}
-          </p>
-        </div>
-
-        {/* Engineered Stack */}
-        <div className="mb-6">
-          <h3 className="text-[11px] sm:text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-2.5">
-            Engineered Stack
-          </h3>
-          <div className="flex flex-wrap gap-1.5 sm:gap-2">
-            {c.stack.map((s) => (
-              <span
-                key={s}
-                className="text-[11px] sm:text-xs font-mono text-purple-700 bg-purple-50/80 border border-purple-200/70 shadow-2xs px-3 py-1.5 rounded-xl font-medium"
-              >
-                {s}
+          {/* Right Subtitle */}
+          <div className="text-left sm:text-right pb-1">
+            <div className="text-xs sm:text-sm font-mono tracking-wider uppercase text-slate-400">
+              OUR PORTFOLIO /{" "}
+              <span className="text-purple-600 font-bold tracking-widest transition-colors duration-200">
+                {activeSystem.name}
               </span>
-            ))}
+            </div>
+            <div className="text-[11px] sm:text-xs font-mono text-slate-400 mt-1">
+              9 systems • Slide {currentPage + 1} of 3
+            </div>
           </div>
         </div>
 
-        {/* Footer Actions (Optimized for Mobile Touch) */}
-        <div className="mt-auto pt-4 sm:pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shrink-0">
-          <button
-            onClick={onOpenAudit}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 hover:bg-purple-700 active:scale-[0.98] px-7 py-3.5 text-sm font-semibold text-white shadow-md hover:shadow-lg transition-all cursor-pointer"
-          >
-            Deploy Similar System <Arrow />
-          </button>
-          <button
-            onClick={onClose}
-            className="w-full sm:w-auto px-6 py-2.5 sm:py-2 rounded-full border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100 active:bg-slate-200 text-xs font-mono font-semibold transition-all text-center cursor-pointer"
-          >
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
+        {/* Work Images Row: Mobile Touch-Snap Horizontal Carousel & Desktop 3-Column Grid */}
+        <div
+          ref={trackRef}
+          onScroll={handleTrackScroll}
+          className="flex md:grid md:grid-cols-3 gap-3.5 sm:gap-4 md:gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none no-scrollbar pb-2 md:pb-0 px-1 -mx-1 items-stretch"
+        >
+          {currentSystems.map((system, idx) => (
+            <div
+              key={system.id}
+              onMouseEnter={() => setHoveredIdx(idx)}
+              onMouseLeave={() => setHoveredIdx(null)}
+              onClick={() => setSelectedProject(system)}
+              className="group relative w-[85vw] sm:w-[360px] md:w-auto shrink-0 snap-center md:snap-align-none h-[360px] sm:h-[420px] md:h-[480px] lg:h-[520px] rounded-2xl md:rounded-3xl overflow-hidden bg-slate-200 cursor-pointer shadow-sm hover:shadow-xl transition-all duration-500"
+            >
+              {/* Image */}
+              <img
+                src={system.image}
+                alt={system.label}
+                className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+                loading="lazy"
+              />
 
-function Card({ c, className = "", onSelect }: { c: (typeof CASES)[number]; className?: string; onSelect: () => void }) {
-  return (
-    <article
-      onClick={onSelect}
-      className={`group relative overflow-hidden bg-slate-900 cursor-pointer select-none active:scale-[0.99] transition-transform ${className}`}
-    >
-      <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-105">
-        {CASE_THUMBS[c.id]}
-      </div>
-      {/* Bottom gradient on mobile keeps client name legible without needing hover; darker hover on desktop */}
-      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/25 to-transparent sm:bg-none sm:group-hover:bg-slate-950/60 transition-all duration-300" />
-      
-      {/* Details: visible on mobile, reveals on desktop hover */}
-      <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4 translate-y-0 opacity-100 sm:translate-y-2 sm:opacity-0 sm:group-hover:translate-y-0 sm:group-hover:opacity-100 transition-all duration-300">
-        <p className="text-[9px] font-mono text-purple-300 font-semibold uppercase tracking-widest mb-0.5">
-          {c.tag}
-        </p>
-        <h3 className="font-display text-sm sm:text-base font-extrabold text-white leading-tight">
-          {c.client}
-        </h3>
-        <p className="text-[10px] font-mono text-white/75 mt-0.5">
-          {c.year} · {c.stack[0]}
-        </p>
-      </div>
+              {/* Mobile-Friendly Informational Overlay */}
+              <div className="md:hidden absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/95 via-slate-950/70 to-transparent p-4 sm:p-5 pt-16 flex flex-col justify-end text-white">
+                <div className="flex items-center justify-between gap-2 mb-1.5">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-purple-300 font-bold bg-purple-900/70 border border-purple-400/30 px-2 py-0.5 rounded-full">
+                    {system.category}
+                  </span>
+                  <span className="text-[10px] font-mono text-white/60">
+                    {system.badge} • {system.year}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="font-display text-xl font-bold text-white tracking-tight">
+                    {system.label}
+                  </h3>
+                  <span className="inline-flex items-center gap-1 text-[11px] font-mono text-purple-300 font-semibold bg-white/10 px-2.5 py-1 rounded-full backdrop-blur-xs">
+                    <span>Inspect</span>
+                    <ArrowUpRight className="w-3 h-3" />
+                  </span>
+                </div>
+                <p className="text-xs text-white/75 font-light mt-1 line-clamp-2 leading-relaxed">
+                  {system.description}
+                </p>
+              </div>
 
-      {/* Floating Arrow Badge: visible on mobile, styled cleanly */}
-      <div className="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 w-7 h-7 rounded-full bg-black/40 sm:bg-white/0 sm:group-hover:bg-white/20 border border-white/20 sm:border-white/0 sm:group-hover:border-white/30 flex items-center justify-center transition-all duration-300 backdrop-blur-xs">
-        <Arrow className="text-white sm:text-white/0 sm:group-hover:text-white transition-colors duration-300 w-3 h-3" />
-      </div>
-    </article>
-  );
-}
-
-export function Work({ onOpenAudit }: { onOpenAudit: () => void }) {
-  const [selectedCase, setSelectedCase] = useState<(typeof CASES)[number] | null>(null);
-  const [activePage, setActivePage] = useState(0);
-  const page = PAGES[activePage]!;
-
-  return (
-    <section id="systems" className="bg-[#faf8f5] text-slate-900 border-t border-slate-200">
-
-      {/* Compact header */}
-      <div className="px-4 md:px-10 pt-8 md:pt-16 pb-4 md:pb-8 flex items-end justify-between gap-4 max-w-[1400px] mx-auto">
-        <div>
-          <span className="eyebrow text-purple-700 font-bold block mb-1 text-[10px] tracking-widest uppercase">Architecture</span>
-          <h2 className="font-display text-[clamp(2rem,6vw,5rem)] font-extrabold leading-[0.95] tracking-tight text-slate-900">
-            Founder-built<br />work.
-          </h2>
-        </div>
-        <div className="text-right shrink-0">
-          <p className="text-[10px] font-mono text-slate-400 tracking-widest uppercase">
-            Our portfolio / <span className="text-purple-600 font-semibold">{page[0]?.client}</span>
-          </p>
-          <p className="text-[10px] font-mono text-slate-400 mt-0.5">{CASES.length} systems</p>
-        </div>
-      </div>
-
-      {/* Images — full bleed, dominate the section */}
-      {/* Mobile: 1 big card full width, then 2 side by side */}
-      <div className="sm:hidden w-full">
-        {page[0] && (
-          <Card c={page[0]} className="w-full h-[58vw]" onSelect={() => setSelectedCase(page[0]!)} />
-        )}
-        <div className="grid grid-cols-2 w-full">
-          {page[1] && <Card c={page[1]} className="h-[46vw]" onSelect={() => setSelectedCase(page[1]!)} />}
-          {page[2] && <Card c={page[2]} className="h-[46vw]" onSelect={() => setSelectedCase(page[2]!)} />}
-        </div>
-      </div>
-
-      {/* Desktop: 3 equal columns */}
-      <div className="hidden sm:grid sm:grid-cols-3 w-full">
-        {page.map((c) => (
-          <Card key={c.id} c={c} className="aspect-[4/3]" onSelect={() => setSelectedCase(c)} />
-        ))}
-      </div>
-
-      {/* Footer bar */}
-      <div className="px-4 md:px-10 py-4 flex items-center justify-between max-w-[1400px] mx-auto border-t border-slate-200">
-        <div className="flex items-center gap-2">
-          {PAGES.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setActivePage(i)}
-              aria-label={`Page ${i + 1}`}
-              className={`rounded-full transition-all duration-300 cursor-pointer ${activePage === i ? "w-5 h-2 bg-slate-900" : "w-2 h-2 bg-slate-300 hover:bg-slate-500"}`}
-            />
+              {/* Desktop subtle hover vignette matching reference screenshot */}
+              <div className="hidden md:block absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors duration-300 pointer-events-none" />
+            </div>
           ))}
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setActivePage((p) => Math.max(0, p - 1))}
-            disabled={activePage === 0}
-            className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-500 hover:border-slate-900 hover:text-slate-900 disabled:opacity-30 transition-all cursor-pointer"
-            aria-label="Previous"
-          >
-            <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M19 12H5M10 7l-5 5 5 5" /></svg>
-          </button>
-          <span className="text-xs font-mono text-slate-400 w-10 text-center">{activePage + 1} / {PAGES.length}</span>
-          <button
-            onClick={() => setActivePage((p) => Math.min(PAGES.length - 1, p + 1))}
-            disabled={activePage === PAGES.length - 1}
-            className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-500 hover:border-slate-900 hover:text-slate-900 disabled:opacity-30 transition-all cursor-pointer"
-            aria-label="Next"
-          >
-            <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M5 12h14M14 7l5 5-5 5" /></svg>
-          </button>
+
+        {/* Mobile Swipe Hint */}
+        <div className="md:hidden flex items-center justify-between text-[11px] font-mono text-slate-400 mt-3 px-1">
+          <span>← Swipe to explore projects →</span>
+          <span className="text-purple-600 font-medium">
+            Tap project to inspect
+          </span>
+        </div>
+
+        {/* Bottom Pagination & Counter Row */}
+        <div className="mt-6 sm:mt-8 md:mt-10 flex items-center justify-between">
+          {/* Left: Pill & Dots Indicators */}
+          <div className="flex items-center gap-2">
+            {PAGES.map((_, pageIdx) => (
+              <button
+                key={pageIdx}
+                type="button"
+                onClick={() => goToPage(pageIdx)}
+                aria-label={`Go to slide ${pageIdx + 1}`}
+                className={`transition-all duration-300 rounded-full cursor-pointer ${
+                  currentPage === pageIdx
+                    ? "w-6 h-1.5 bg-slate-900"
+                    : "w-1.5 h-1.5 bg-slate-300 hover:bg-slate-400"
+                }`}
+              />
+            ))}
+          </div>
+
+          {/* Right: Arrows and 1 / 3 counter */}
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <button
+              type="button"
+              onClick={handlePrev}
+              aria-label="Previous slide"
+              className="w-8 h-8 rounded-full border border-slate-300 hover:border-slate-900 hover:text-slate-900 flex items-center justify-center text-xs font-mono text-slate-600 transition-colors cursor-pointer active:scale-95"
+            >
+              ←
+            </button>
+            <span className="text-xs font-mono text-slate-500 select-none tracking-wider px-1">
+              {currentPage + 1} / {PAGES.length}
+            </span>
+            <button
+              type="button"
+              onClick={handleNext}
+              aria-label="Next slide"
+              className="w-8 h-8 rounded-full border border-slate-300 hover:border-slate-900 hover:text-slate-900 flex items-center justify-center text-xs font-mono text-slate-600 transition-colors cursor-pointer active:scale-95"
+            >
+              →
+            </button>
+          </div>
         </div>
       </div>
 
-      {selectedCase && (
-        <CaseStudyModal
-          c={selectedCase}
-          onClose={() => setSelectedCase(null)}
-          onOpenAudit={() => { setSelectedCase(null); onOpenAudit(); }}
-        />
-      )}
+      {/* Project Case Preview Modal (Mounted to document.body via Portal to guarantee 100% viewport centering on mobile!) */}
+      {isClient &&
+        selectedProject &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-3.5 sm:p-6 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200"
+            onClick={() => setSelectedProject(null)}
+          >
+            <div
+              className="relative w-full max-w-lg max-h-[88dvh] overflow-y-auto rounded-3xl bg-white border border-slate-200 text-slate-900 shadow-2xl p-5 sm:p-7 no-scrollbar my-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={() => setSelectedProject(null)}
+                className="absolute top-4 right-4 sm:top-5 sm:right-5 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-colors cursor-pointer text-sm font-bold z-10"
+                aria-label="Close details"
+              >
+                ✕
+              </button>
+
+              {/* Project Image */}
+              <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden bg-slate-100 mb-4 border border-slate-200">
+                <img
+                  src={selectedProject.image}
+                  alt={selectedProject.label}
+                  className="w-full h-full object-cover object-center"
+                />
+                <div className="absolute top-3 left-3 flex items-center gap-1.5 bg-slate-900/85 backdrop-blur-md text-white px-3 py-1 rounded-full text-xs font-mono">
+                  <span>{selectedProject.badge}</span>
+                  <span>•</span>
+                  <span>{selectedProject.year}</span>
+                </div>
+              </div>
+
+              {/* Title & Category */}
+              <div className="mb-3">
+                <span className="text-[10px] font-mono font-bold text-purple-700 bg-purple-50 border border-purple-200 px-2.5 py-0.5 rounded-full uppercase tracking-wider inline-block mb-1.5">
+                  {selectedProject.category}
+                </span>
+                <h3 className="font-display text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                  {selectedProject.label}
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-600 mt-1.5 font-light leading-relaxed">
+                  {selectedProject.description}
+                </p>
+              </div>
+
+              {/* Documented Outcome Pill */}
+              <div className="my-3.5 p-3 rounded-2xl bg-[#faf8f5] border border-slate-200 flex items-center gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <div>
+                  <span className="text-[9px] font-mono uppercase tracking-wider text-slate-400 block font-semibold">
+                    Documented Studio Outcome
+                  </span>
+                  <span className="text-xs sm:text-sm font-mono font-bold text-slate-900">
+                    {selectedProject.outcome}
+                  </span>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row gap-2.5 mt-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const label = selectedProject.label;
+                    setSelectedProject(null);
+                    onOpenAudit?.(label);
+                  }}
+                  className="flex-1 rounded-full bg-purple-600 hover:bg-purple-700 py-3 text-xs sm:text-sm font-semibold text-white shadow-sm transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <span>Book Free AI Growth Audit</span>
+                  <ArrowUpRight className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedProject(null)}
+                  className="rounded-full bg-slate-100 hover:bg-slate-200 py-3 px-5 text-xs font-semibold text-slate-700 transition-colors cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
     </section>
   );
 }
-
