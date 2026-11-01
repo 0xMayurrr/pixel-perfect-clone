@@ -14,8 +14,7 @@ vi.mock("@tanstack/react-router", async () => {
     ),
   };
 });
-
-import { ContactPage } from "@/routes/contact";
+import { ContactPage } from "@/components/ContactPage";
 
 describe("Contact / Project Inquiry Page", () => {
   it("renders the sweet, clean light-theme form with PDF download options", () => {
