@@ -1,19 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import { Work } from "../components/Work";
+import { DocsSection } from "../components/DocsSection";
 
-const CASE_THUMBS: Record<string, React.ReactNode> = {
-  markeee: (<img src="/thumbnails/markeee.jpg" alt="Markeee" className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105" loading="lazy" />),
-  bizbrain: (<img src="/thumbnails/bizbrain.jpg" alt="BizBrain" className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105" loading="lazy" />),
-  growzo: (<img src="/thumbnails/growzo.jpg" alt="Growzo" className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105" loading="lazy" />),
-  vibestay: (<img src="/thumbnails/vibestay.jpg" alt="VibeStay" className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105" loading="lazy" />),
-  "campus-aid-buddy": (<img src="/thumbnails/campus-aid-buddy.jpg" alt="Campus Aid Buddy" className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105" loading="lazy" />),
-  "tuition-os": (<img src="/thumbnails/tuition-os.jpg" alt="Tuition OS" className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105" loading="lazy" />),
-  "clientsync-os": (<img src="/thumbnails/clientsync-os.jpg" alt="ClientSync OS" className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105" loading="lazy" />),
-  kindred: (<img src="/thumbnails/kindred.jpg" alt="Kindred" className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105" loading="lazy" />),
-  "rs-technologies": (<img src="/thumbnails/rs-technologies.jpg" alt="RS Technologies" className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105" loading="lazy" />),
-};
+
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -408,6 +400,7 @@ function Index() {
         <Process />
         <Packages onSelectPkg={(pkg, market) => handleOpenAudit(pkg, market)} />
         <Work onOpenAudit={() => handleOpenAudit()} />
+        <DocsSection onOpenAudit={() => handleOpenAudit()} />
       </main>
       <Footer onOpenAudit={() => handleOpenAudit()} />
       {auditModalOpen && (<AuditBookingModal initialPackage={selectedAuditPkg} initialMarket={selectedMarket} onClose={() => setAuditModalOpen(false)} />)}
@@ -431,6 +424,7 @@ function Nav({ onOpenAudit }: { onOpenAudit: () => void }) {
           <a href="#process" className="link-line hover:text-slate-900 transition-colors">Pipeline</a>
           <a href="#packages" className="link-line hover:text-slate-900 transition-colors">Packages</a>
           <a href="#systems" className="link-line hover:text-slate-900 transition-colors">Founder Systems</a>
+          <a href="#docs" className="link-line hover:text-slate-900 transition-colors">Documentation</a>
         </nav>
         <button onClick={onOpenAudit} className="group inline-flex items-center gap-1.5 sm:gap-2 rounded-full bg-slate-900 px-3.5 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-semibold text-white transition-all hover:bg-purple-600 hover:shadow-lg cursor-pointer shrink-0">
           <span className="hidden sm:inline">Book Free AI Growth Audit</span>
@@ -450,16 +444,16 @@ function Hero({ onOpenAudit }: { onOpenAudit: () => void }) {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(168,85,247,0.10)_0%,rgba(99,102,241,0.03)_40%,#faf8f5_75%)] pointer-events-none" />
       <div className="cinematic-noise opacity-30" />
       <div className="relative z-10 mx-auto w-full max-w-[1400px] grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-        <div className="lg:col-span-8 order-1 flex flex-col justify-center items-start text-left max-w-3xl pl-4 sm:pl-8 lg:pl-12 mt-4 lg:mt-16">
-          <h1 className="font-sans text-[clamp(2.4rem,5.6vw,5.5rem)] leading-[1.12] tracking-tight text-slate-900 font-extrabold text-left animate-in fade-in duration-500">
+        <div className="lg:col-span-8 order-1 flex flex-col justify-center items-start text-left max-w-3xl pl-0 sm:pl-8 lg:pl-12 mt-4 lg:mt-16">
+          <h1 className="font-sans text-[clamp(2.2rem,5.6vw,5.5rem)] leading-[1.12] tracking-tight text-slate-900 font-extrabold text-left animate-in fade-in duration-500">
             Turn Your Business Into a <span className="text-purple-700">Growth System.</span>
           </h1>
-          <p className="mt-6 max-w-xl text-slate-600 text-base md:text-xl leading-relaxed font-normal text-left animate-in fade-in duration-700">
+          <p className="mt-4 sm:mt-6 max-w-xl text-slate-600 text-base md:text-xl leading-relaxed font-normal text-left animate-in fade-in duration-700">
             We install AI growth systems that capture leads, respond instantly, qualify prospects, book appointments, and remove manual work.
           </p>
-          <div className="mt-8 flex flex-wrap items-center gap-3.5 animate-in fade-in duration-700">
-            <button onClick={onOpenAudit} className="rounded-full bg-purple-600 text-white px-7 py-4 text-sm font-semibold transition-all hover:bg-purple-700 hover:shadow-lg hover:scale-105 shadow-md shadow-purple-600/20 cursor-pointer">Book Free AI Growth Audit</button>
-            <a href="#systems" className="rounded-full border border-slate-300 bg-white px-6 py-4 text-sm font-semibold text-slate-800 transition-all hover:bg-purple-50 hover:border-purple-300 shadow-2xs">View Our Systems</a>
+          <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto animate-in fade-in duration-700">
+            <button onClick={onOpenAudit} className="w-full sm:w-auto text-center rounded-full bg-purple-600 text-white px-7 py-3.5 sm:py-4 text-sm font-semibold transition-all hover:bg-purple-700 hover:shadow-lg active:scale-95 shadow-md shadow-purple-600/20 cursor-pointer">Book Free AI Growth Audit</button>
+            <a href="#systems" className="w-full sm:w-auto text-center rounded-full border border-slate-300 bg-white px-6 py-3.5 sm:py-4 text-sm font-semibold text-slate-800 transition-all hover:bg-purple-50 hover:border-purple-300 shadow-2xs">View Our Systems</a>
           </div>
           {!isDesktop && <MobileHeroGlobe />}
         </div>
@@ -808,6 +802,9 @@ function Footer({ onOpenAudit }: { onOpenAudit?: () => void }) {
             <a href="#packages" className="hover:text-white transition-colors">
               Pricing
             </a>
+            <a href="#docs" className="hover:text-white transition-colors">
+              Docs
+            </a>
             <Link to="/contact" className="hover:text-white transition-colors">
               Contact
             </Link>
@@ -853,11 +850,16 @@ function AuditBookingModal({ initialPackage, initialMarket, onClose }: { initial
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
+    const orig = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     const handleKeyDown = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", handleKeyDown);
     return () => {
+      document.body.style.overflow = orig;
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [onClose]);
@@ -883,10 +885,12 @@ function AuditBookingModal({ initialPackage, initialMarket, onClose }: { initial
     } finally { setIsSubmitting(false); }
   };
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3.5 sm:p-6 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200" onClick={onClose}>
-      <div className="relative w-full sm:max-w-lg max-h-[85dvh] sm:max-h-[88dvh] overflow-y-auto rounded-[24px] sm:rounded-3xl bg-white border border-slate-200 p-5 sm:p-8 md:p-10 text-slate-900 shadow-2xl no-scrollbar overscroll-contain flex flex-col" onClick={(e) => e.stopPropagation()}>
-        <button onClick={onClose} className="absolute top-5 right-5 sm:top-6 sm:right-6 w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-colors cursor-pointer text-sm font-bold shadow-2xs z-10" aria-label="Close modal">✕</button>
+  if (!isClient) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-6 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200" onClick={onClose}>
+      <div className="relative w-full sm:max-w-lg max-h-[88dvh] overflow-y-auto rounded-3xl bg-white border border-slate-200 p-5 sm:p-8 text-slate-900 shadow-2xl my-auto no-scrollbar" onClick={(e) => e.stopPropagation()}>
+        <button onClick={onClose} className="absolute top-4 right-4 sm:top-5 sm:right-5 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-colors cursor-pointer text-sm font-bold shadow-2xs z-10" aria-label="Close modal">✕</button>
         {isSubmitted ? (
           <div className="text-center py-6">
             <div className="w-14 h-14 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto mb-4 text-2xl font-bold">✓</div>
@@ -941,6 +945,7 @@ function AuditBookingModal({ initialPackage, initialMarket, onClose }: { initial
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
