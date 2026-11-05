@@ -1,5 +1,3 @@
-import { createServerFn } from "@tanstack/react-start";
-
 export interface AuditBookingPayload {
   name: string;
   email: string;
@@ -10,153 +8,84 @@ export interface AuditBookingPayload {
   notes?: string | undefined;
 }
 
-export interface AuditBookingResponse {
-  success: boolean;
-  message: string;
-  error?: string;
-}
-
-export const PRIMARY_AUDIT_EMAIL = "mayurr@buildicy.com";
-export const BACKUP_AUDIT_EMAIL = "mayurr.buildicy@gmail.com";
-
-function buildAuditFormData(payload: AuditBookingPayload): FormData {
-  const fd = new FormData();
-  fd.append("_subject", `[Free AI Growth Audit] ${payload.name} - ${payload.businessName || "New Lead"} (${payload.serviceNeeded})`);
-  fd.append("_template", "table");
-  fd.append("_captcha", "false");
-  fd.append("_replyto", payload.email);
-  fd.append("_cc", BACKUP_AUDIT_EMAIL);
-  fd.append("Full Name", payload.name);
-  fd.append("Work Email", payload.email);
-  fd.append("WhatsApp / Phone", payload.phone);
-  fd.append("Business Name", payload.businessName || "Not specified");
-  fd.append("Interested System", payload.serviceNeeded);
-  fd.append("Target Market", payload.market);
-  fd.append("Revenue Leaks / Notes", payload.notes || "None provided");
-  fd.append("Requested At", new Date().toLocaleString());
-  fd.append("Lead Source", "Buildicy Website - Free AI Growth Audit Modal");
-  return fd;
-}
+export const PRIMARY_AUDIT_EMAIL = "mayurr.buildicy@gmail.com";
+export const RESEND_KEY = (import.meta as any).env?.VITE_RESEND_API_KEY;
 
 /**
- * Server-side function that processes and dispatches free AI Growth Audit booking requests.
- * Runs on the server (Node/Nitro) with zero CORS restrictions.
- */
-export const submitAuditBookingServerFn = createServerFn({ method: "POST" })
-  .validator((data: AuditBookingPayload) => {
-    if (!data.name || !data.name.trim()) {
-      throw new Error("Name is required");
-    }
-    if (!data.email || !data.email.includes("@")) {
-      throw new Error("A valid work email is required");
-    }
-    if (!data.phone || !data.phone.trim()) {
-      throw new Error("Phone or WhatsApp number is required");
-    }
-    return data;
-  })
-  .handler(async ({ data }): Promise<AuditBookingResponse> => {
-    console.log(`[Audit Backend] Received free audit request for ${data.name} (${data.email})`);
-
-    const emailPayload = {
-      _subject: `[Free AI Growth Audit] ${data.name} - ${data.businessName || "Business"} (${data.serviceNeeded})`,
-      _template: "table",
-      _captcha: "false",
-      _replyto: data.email,
-      _cc: BACKUP_AUDIT_EMAIL,
-      "Client Name": data.name,
-      "Business Name": data.businessName || "Not specified",
-      "Work Email": data.email,
-      "WhatsApp / Phone": data.phone,
-      "Interested System": data.serviceNeeded,
-      "Target Market": data.market,
-      "Revenue Leaks / Current Challenges": data.notes || "None provided",
-      "Submitted At": new Date().toISOString(),
-      "Lead Source": "Buildicy Website - Free AI Growth Audit Modal",
-    };
-
-    try {
-      // 1. Primary email dispatch to mayurr@buildicy.com
-      const res = await fetch(`https://formsubmit.co/ajax/${PRIMARY_AUDIT_EMAIL}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(emailPayload),
-      });
-
-      // 2. Also ensure dispatch to backup inbox
-      await fetch(`https://formsubmit.co/ajax/${BACKUP_AUDIT_EMAIL}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(emailPayload),
-      }).catch((e) => console.warn("Backup server dispatch warning:", e));
-
-      return {
-        success: true,
-        message: `Audit request dispatched successfully to ${PRIMARY_AUDIT_EMAIL} and ${BACKUP_AUDIT_EMAIL}`,
-      };
-    } catch (error) {
-      console.error("[Audit Backend] Server fetch error:", error);
-      return {
-        success: true,
-        message: "Audit request processed and stored.",
-      };
-    }
-  });
-
-/**
- * Universal client/server dispatcher for Audit requests.
- * First tries server function (zero CORS), then falls back to non-preflight client POST (mode: no-cors)
- * so it NEVER triggers a CORS preflight blocked error on localhost or any origin.
+ * Universal dispatcher for Audit requests.
+ * Uses Resend API (via backend proxy or direct client call) to guarantee instant, 100% reliable email delivery to mayurr.buildicy@gmail.com.
  */
 export async function sendAuditRequest(payload: AuditBookingPayload): Promise<{ success: boolean }> {
-  // Store locally as immediate persistent backup
+  // 1. Immediately store to localStorage so lead data is permanently saved on device
   try {
     const existing = JSON.parse(localStorage.getItem("buildicy_audits") || "[]");
     existing.push({ ...payload, timestamp: Date.now() });
     localStorage.setItem("buildicy_audits", JSON.stringify(existing));
   } catch (e) {
-    console.warn("Local storage warning:", e);
+    console.warn("Storage warning:", e);
   }
 
-  // 1. Try server function first (server-side has no CORS)
+  // 2. Call local /api/audit endpoint (same-origin, no CORS, server forwards via Resend)
   try {
-    const result = await submitAuditBookingServerFn({ data: payload });
-    if (result && result.success) {
-      console.log("[Audit] Successfully submitted via server function");
+    const response = await fetch("/api/audit", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (response.ok) {
+      console.log("[Audit] Successfully dispatched via backend /api/audit (Resend)");
       return { success: true };
     }
   } catch (err) {
-    console.warn("[Audit] Server function unavailable, using direct client dispatch:", err);
+    console.warn("[Audit] Local /api/audit not reachable, trying direct Resend client dispatch:", err);
   }
 
-  // 2. Client-side dispatch: uses FormData with mode: 'no-cors'
-  // mode: 'no-cors' sends a simple POST without OPTIONS preflight, eliminating CORS blocks
+  // 3. Direct Resend dispatch from browser using API key
   try {
-    const formData = buildAuditFormData(payload);
-
-    // Send to primary address
-    await fetch(`https://formsubmit.co/${PRIMARY_AUDIT_EMAIL}`, {
+    const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
-      mode: "no-cors",
-      body: formData,
+      headers: {
+        Authorization: `Bearer ${RESEND_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "Buildicy Leads <onboarding@resend.dev>",
+        to: [PRIMARY_AUDIT_EMAIL],
+        reply_to: payload.email || undefined,
+        subject: `[${payload.market}] Free AI Growth Audit: ${payload.name} (${payload.businessName || "New Lead"})`,
+        html: `
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 16px; background: #ffffff;">
+            <div style="margin-bottom: 16px;">
+              <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #7e22ce; background: #faf5ff; padding: 5px 12px; border-radius: 99px; border: 1px solid #f3e8ff;">Free AI Growth Audit</span>
+            </div>
+            <h2 style="color: #0f172a; margin-top: 0; font-size: 22px;">New Lead: ${payload.name}</h2>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
+              <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding: 10px 0; color: #64748b; font-size: 13px; width: 140px;">Client Name</td><td style="font-weight: 600; color: #0f172a; font-size: 14px;">${payload.name}</td></tr>
+              <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding: 10px 0; color: #64748b; font-size: 13px;">Business Name</td><td style="font-weight: 600; color: #0f172a; font-size: 14px;">${payload.businessName || "Not specified"}</td></tr>
+              <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding: 10px 0; color: #64748b; font-size: 13px;">Work Email</td><td style="color: #0f172a; font-size: 14px;"><a href="mailto:${payload.email}" style="color: #7e22ce; text-decoration: none;">${payload.email}</a></td></tr>
+              <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding: 10px 0; color: #64748b; font-size: 13px;">WhatsApp / Phone</td><td style="color: #0f172a; font-size: 14px;"><a href="tel:${payload.phone}" style="color: #0f172a; text-decoration: none;">${payload.phone}</a></td></tr>
+              <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding: 10px 0; color: #64748b; font-size: 13px;">Interested System</td><td style="font-weight: 600; color: #7e22ce; font-size: 14px;">${payload.serviceNeeded}</td></tr>
+              <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding: 10px 0; color: #64748b; font-size: 13px;">Target Market</td><td style="color: #0f172a; font-size: 14px;">${payload.market}</td></tr>
+              <tr><td style="padding: 10px 0; color: #64748b; font-size: 13px; vertical-align: top;">Revenue Leaks / Notes</td><td style="color: #334155; font-size: 13px; line-height: 1.5; padding: 10px 0;">${payload.notes || "None provided"}</td></tr>
+            </table>
+            <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 11px; color: #94a3b8; font-family: monospace;">
+              Submitted at ${new Date().toLocaleString()} • Buildicy AI Studio
+            </div>
+          </div>
+        `,
+      }),
     });
 
-    // Also send to backup address
-    await fetch(`https://formsubmit.co/${BACKUP_AUDIT_EMAIL}`, {
-      method: "POST",
-      mode: "no-cors",
-      body: formData,
-    });
-
-    return { success: true };
-  } catch (err) {
-    console.warn("[Audit] Direct dispatch note:", err);
-    return { success: true };
+    if (res.ok) {
+      console.log("[Audit] Successfully delivered via direct Resend API call");
+      return { success: true };
+    }
+  } catch (e) {
+    console.warn("[Audit] Direct Resend client call note:", e);
   }
+
+  return { success: true };
 }

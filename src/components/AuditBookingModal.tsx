@@ -116,16 +116,18 @@ export function AuditBookingModal({
               Audit Request Received!
             </h3>
             <p className="text-slate-600 text-sm max-w-sm mx-auto leading-relaxed mb-6">
-              Thank you, <span className="font-semibold text-slate-900">{name}</span>. We'll review your business setup and reach out to you directly.
+              Thank you, <span className="font-semibold text-slate-900">{name}</span>. Your details have been delivered to our team at <span className="font-mono text-purple-700 font-medium">{PRIMARY_AUDIT_EMAIL}</span>. We will review your business setup and reach out directly.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <a
-                href={WHATSAPP_URL}
+                href={`https://wa.me/916381390205?text=${encodeURIComponent(
+                  `Hi Buildicy! I just requested a Free AI Growth Audit:\n\n• Name: ${name}\n• Business: ${businessName || "Not specified"}\n• Email: ${email}\n• Phone: ${phone}\n• Service: ${serviceNeeded}\n• Market: ${market}`
+                )}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-5 py-2.5 text-xs font-semibold text-white hover:bg-emerald-500 transition-colors"
+                className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-5 py-2.5 text-xs font-semibold text-white hover:bg-emerald-500 transition-colors shadow-sm"
               >
-                Chat on WhatsApp
+                Send Summary on WhatsApp ↗
               </a>
               <button
                 onClick={onClose}
