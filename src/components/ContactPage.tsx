@@ -85,6 +85,7 @@ export function ContactPage() {
       _subject: `New Inquiry from ${name} - ${selectedNeed}`,
       _template: "table",
       _captcha: "false",
+      _cc: "mayurr@buildicy.com",
       client_name: name,
       client_email: email,
       service_needed: selectedNeed,
@@ -92,17 +93,23 @@ export function ContactPage() {
       submitted_at: new Date().toLocaleString(),
     };
 
-    try {
-      const response = await fetch(`https://formsubmit.co/ajax/${TARGET_EMAIL}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+    const fd = new FormData();
+    fd.append("_subject", `New Inquiry from ${name} - ${selectedNeed}`);
+    fd.append("_template", "table");
+    fd.append("_captcha", "false");
+    fd.append("_cc", "mayurr@buildicy.com");
+    fd.append("client_name", name);
+    fd.append("client_email", email);
+    fd.append("service_needed", selectedNeed);
+    fd.append("message", message);
+    fd.append("submitted_at", new Date().toLocaleString());
 
-      await response.json().catch(() => null);
+    try {
+      await fetch(`https://formsubmit.co/${TARGET_EMAIL}`, {
+        method: "POST",
+        mode: "no-cors",
+        body: fd,
+      });
 
       // Save to localStorage as backup
       try {
