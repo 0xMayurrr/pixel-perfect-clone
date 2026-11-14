@@ -425,6 +425,7 @@ function Nav({ onOpenAudit }: { onOpenAudit: () => void }) {
           <a href="#process" className="link-line hover:text-slate-900 transition-colors">Pipeline</a>
           <a href="#packages" className="link-line hover:text-slate-900 transition-colors">Packages</a>
           <a href="#systems" className="link-line hover:text-slate-900 transition-colors">Founder Systems</a>
+          <Link to="/founders" className="link-line hover:text-purple-600 transition-colors">Founders</Link>
           <a href="#docs" className="link-line hover:text-slate-900 transition-colors">Documentation</a>
         </nav>
         <button onClick={onOpenAudit} className="group inline-flex items-center gap-1.5 sm:gap-2 rounded-full bg-slate-900 px-3.5 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-semibold text-white transition-all hover:bg-purple-600 hover:shadow-lg cursor-pointer shrink-0">
@@ -774,10 +775,10 @@ function Footer({ onOpenAudit }: { onOpenAudit?: () => void }) {
 
               <div>
                 <a
-                  href="mailto:mayurr.buildicy@gmail.com"
+                  href="mailto:hello@buildicy.com"
                   className="text-sm md:text-base font-mono text-white/50 hover:text-white transition-colors"
                 >
-                  mayurr.buildicy@gmail.com
+                  hello@buildicy.com
                 </a>
               </div>
             </div>
@@ -806,6 +807,9 @@ function Footer({ onOpenAudit }: { onOpenAudit?: () => void }) {
             <a href="#docs" className="hover:text-white transition-colors">
               Docs
             </a>
+            <Link to="/founders" className="hover:text-white transition-colors text-purple-300 font-semibold">
+              Founders
+            </Link>
             <Link to="/contact" className="hover:text-white transition-colors">
               Contact
             </Link>
