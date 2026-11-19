@@ -84,11 +84,7 @@ function SplashScreen({ onDone }: { onDone: () => void }) {
             animation: "pulse 1.5s ease-in-out infinite",
           }} />
         </div>
-        <span style={{
-          fontFamily: "'Space Mono', monospace",
-          fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase",
-          color: "#9333ea", fontWeight: 700,
-        }}>AI Growth Systems Studio</span>
+
       </div>
 
       {/* Progress bar */}

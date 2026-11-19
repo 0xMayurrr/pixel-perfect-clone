@@ -21,7 +21,7 @@ export function AuditBookingModal({
   const [phone, setPhone] = useState("");
   const [businessName, setBusinessName] = useState("");
   const [serviceNeeded, setServiceNeeded] = useState(
-    initialPackage || "AI Front Desk + Funnel"
+    initialPackage || "AI Lead Concierge"
   );
   const [market, setMarket] = useState(initialMarket || "India — INR");
   const [notes, setNotes] = useState("");
@@ -219,20 +219,13 @@ export function AuditBookingModal({
                     onChange={(e) => setServiceNeeded(e.target.value)}
                     className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-base sm:text-sm text-slate-900 focus:outline-none focus:border-purple-600 focus:bg-white transition-colors"
                   >
-                    <optgroup label="Individual Services">
-                      <option value="AI Funnel System">AI Funnel System</option>
-                      <option value="AI Receptionist">AI Receptionist</option>
-                      <option value="AI Automation">AI Automation</option>
-                      <option value="Digital Product System">Digital Product System</option>
-                      <option value="Digital Marketing">Digital Marketing</option>
-                      <option value="Website / Landing Page">Website / Landing Page</option>
-                    </optgroup>
-                    <optgroup label="Growth Packages">
-                      <option value="AI Front Desk + Funnel (Most Popular)">
-                        AI Front Desk + Funnel (Most Popular)
-                      </option>
-                      <option value="AI Lead Machine">AI Lead Machine</option>
+                    <optgroup label="Main Systems">
+                      <option value="AI Funnel">AI Funnel</option>
+                      <option value="AI Lead Concierge">AI Lead Concierge (Most Popular)</option>
                       <option value="Complete AI Growth Engine">Complete AI Growth Engine</option>
+                    </optgroup>
+                    <optgroup label="Custom Engineering">
+                      <option value="Buildicy Studio — Custom Build">Buildicy Studio (Custom Build)</option>
                     </optgroup>
                   </select>
                 </div>
