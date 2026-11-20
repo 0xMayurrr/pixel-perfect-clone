@@ -668,82 +668,47 @@ function Hero({ onOpenAudit }: { onOpenAudit: () => void }) {
 
 function FollowUpBottleneck() {
   const problems = [
-    {
-      metric: "4+ Hours Delay",
-      title: "Slow Response",
-      desc: "Deals go to whoever answers first. Hours of delay sends warm buyers straight to competitors.",
-      icon: Clock,
-    },
-    {
-      metric: "62% Unanswered",
-      title: "Missed Enquiries",
-      desc: "After-hours and weekend inquiries bounce into voicemails nobody checks, leaking revenue 24/7.",
-      icon: PhoneCall,
-    },
-    {
-      metric: "70% Wasted Time",
-      title: "Unqualified Leads",
-      desc: "Closers waste hours manually screening tire-kickers instead of closing high-ticket buyers.",
-      icon: Users,
-    },
-    {
-      metric: "80% Drop-Off",
-      title: "Zero Follow-Up",
-      desc: "Contracts take 5+ touchpoints, yet most prospects are completely abandoned after one message.",
-      icon: TrendingUp,
-    },
+    { metric: "4+ hrs delay", title: "Slow Response", desc: "Deals go to whoever answers first. Hours of delay sends warm buyers to competitors.", icon: Clock },
+    { metric: "62% unanswered", title: "Missed Enquiries", desc: "After-hours inquiries bounce to voicemail, leaking revenue 24/7.", icon: PhoneCall },
+    { metric: "70% wasted", title: "Unqualified Leads", desc: "Closers waste hours screening tire-kickers instead of closing buyers.", icon: Users },
+    { metric: "80% drop-off", title: "Zero Follow-Up", desc: "Contracts need 5+ touchpoints, yet most prospects are abandoned after one message.", icon: TrendingUp },
   ];
 
   return (
-    <section
-      id="problem"
-      className="px-6 py-20 md:px-12 md:py-24 bg-[#faf8f5] text-slate-900 border-t border-slate-200"
-    >
+    <section id="problem" className="px-6 py-14 md:px-12 md:py-24 bg-[#faf8f5] text-slate-900 border-t border-slate-200">
       <div className="mx-auto max-w-[1380px]">
-        {/* Minimalist Eyebrow & Headline */}
-        <div className="reveal-blur max-w-3xl mb-10 sm:mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-purple-50 text-purple-700 border border-purple-200/80 mb-3.5">
+        <div className="reveal-blur max-w-3xl mb-8">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-purple-50 text-purple-700 border border-purple-200/80 mb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse" />
             THE REVENUE LEAK
           </div>
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 leading-[1.15]">
-            Most businesses do not have a lead problem.{" "}
-            <span className="text-slate-400 font-normal italic">
-              They have a follow-up problem.
-            </span>
+          <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 leading-[1.15]">
+            Most businesses don't have a lead problem.{" "}
+            <span className="text-slate-400 font-normal italic">They have a follow-up problem.</span>
           </h2>
         </div>
 
-        {/* 4 Clean Minimalist Problem Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+        {/* 2-col on mobile, 4-col on desktop */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
           {problems.map((p, idx) => {
             const Icon = p.icon;
             return (
               <div
                 key={p.title}
-                className="reveal-zoom bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-7 border border-slate-200/90 shadow-xs hover:shadow-md hover:border-purple-300 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group"
+                className="reveal-zoom bg-white rounded-2xl p-4 sm:p-6 border border-slate-200/90 shadow-xs hover:border-purple-300 transition-all duration-300 flex flex-col gap-3 group"
                 style={{ transitionDelay: `${idx * 80}ms` }}
               >
-                <div>
-                  {/* Top Metric Pill + Icon */}
-                  <div className="flex items-center justify-between mb-5">
-                    <span className="text-[11px] font-mono font-bold text-purple-700 bg-purple-50 border border-purple-100 px-2.5 py-1 rounded-lg uppercase tracking-wider">
-                      {p.metric}
-                    </span>
-                    <div className="w-8 h-8 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-purple-600 group-hover:bg-purple-50 group-hover:border-purple-100 transition-colors">
-                      <Icon className="w-4 h-4" />
-                    </div>
+                <div className="flex items-center justify-between">
+                  <div className="w-8 h-8 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600">
+                    <Icon className="w-4 h-4" />
                   </div>
-
-                  {/* Title */}
-                  <h3 className="font-display text-lg sm:text-xl font-bold text-slate-900 group-hover:text-purple-900 transition-colors mb-2">
-                    {p.title}
-                  </h3>
-
-                  {/* Short Scannable Copy */}
-                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
-                    {p.desc}
-                  </p>
+                  <span className="text-[10px] font-mono font-bold text-purple-700 bg-purple-50 border border-purple-100 px-2 py-0.5 rounded-md uppercase tracking-wide">
+                    {p.metric}
+                  </span>
+                </div>
+                <div>
+                  <h3 className="font-display text-sm sm:text-base font-bold text-slate-900 mb-1">{p.title}</h3>
+                  <p className="text-[11px] sm:text-xs text-slate-500 leading-relaxed">{p.desc}</p>
                 </div>
               </div>
             );
@@ -883,7 +848,7 @@ function VideoDashboardSection({ onOpenAudit }: { onOpenAudit: () => void }) {
           </div>
 
           {/* Interactive Dynamic Canvas */}
-          <div className="relative bg-gradient-to-br from-[#f0f4ff]/70 via-[#f8fafc] to-[#ffffff] p-4 sm:p-6 md:p-10 min-h-[460px] flex flex-col justify-between overflow-hidden">
+          <div className="relative bg-gradient-to-br from-[#f0f4ff]/70 via-[#f8fafc] to-[#ffffff] p-4 sm:p-6 md:p-8 min-h-[420px] sm:min-h-[460px] flex flex-col justify-between overflow-hidden">
             {/* Soft Ambient Radial Blur Background */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-purple-200/25 rounded-full filter blur-3xl pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-200/20 rounded-full filter blur-3xl pointer-events-none" />
@@ -906,7 +871,7 @@ function VideoDashboardSection({ onOpenAudit }: { onOpenAudit: () => void }) {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
+                <div className="grid grid-cols-2 gap-3">
                   {/* Card 1 */}
                   <div className="rounded-[18px] sm:rounded-[24px] bg-white border border-slate-100 p-4 sm:p-6 shadow-[0_16px_40px_-8px_rgba(15,23,42,0.06)] hover:border-purple-200 transition-all">
                     <div className="flex items-center justify-between">
@@ -1001,9 +966,9 @@ function VideoDashboardSection({ onOpenAudit }: { onOpenAudit: () => void }) {
 
             {/* TAB 1: 02 OMNICHANNEL STREAM */}
             {activeTab === 1 && (
-              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-stretch animate-in fade-in duration-300">
+              <div className="relative z-10 flex flex-col lg:grid lg:grid-cols-12 gap-4 items-stretch animate-in fade-in duration-300">
                 {/* Left Live Volume Box */}
-                <div className="lg:col-span-5 rounded-[20px] sm:rounded-[28px] bg-white border border-slate-100 p-5 sm:p-7 shadow-[0_20px_50px_rgba(15,23,42,0.06)] flex flex-col justify-between">
+                <div className="lg:col-span-5 rounded-[20px] bg-white border border-slate-100 p-4 sm:p-6 shadow-[0_20px_50px_rgba(15,23,42,0.06)] flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-slate-900 text-lg">Active Enquiries</span>
@@ -1035,7 +1000,7 @@ function VideoDashboardSection({ onOpenAudit }: { onOpenAudit: () => void }) {
                 </div>
 
                 {/* Right Live Activity Feed */}
-                <div className="lg:col-span-7 rounded-[20px] sm:rounded-[28px] bg-white border border-slate-100 p-5 sm:p-7 shadow-[0_20px_50px_rgba(15,23,42,0.06)]">
+                <div className="lg:col-span-7 rounded-[20px] bg-white border border-slate-100 p-4 sm:p-6 shadow-[0_20px_50px_rgba(15,23,42,0.06)]">
                   <div className="flex items-center justify-between mb-5">
                     <span className="font-bold text-slate-900 text-lg">Live Inbound Activity</span>
                     <span className="text-xs font-mono text-purple-700 font-semibold">Sub-30s Triage</span>
@@ -1108,9 +1073,9 @@ function VideoDashboardSection({ onOpenAudit }: { onOpenAudit: () => void }) {
 
             {/* TAB 2: 03 SUB-MINUTE TRIAGE */}
             {activeTab === 2 && (
-              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-stretch animate-in fade-in duration-300">
+              <div className="relative z-10 flex flex-col lg:grid lg:grid-cols-12 gap-4 items-stretch animate-in fade-in duration-300">
                 {/* Left Conversational AI Box */}
-                <div className="lg:col-span-7 rounded-[20px] sm:rounded-[28px] bg-white border border-slate-100 p-5 sm:p-7 shadow-[0_20px_50px_rgba(15,23,42,0.06)] flex flex-col justify-between">
+                <div className="lg:col-span-7 rounded-[20px] bg-white border border-slate-100 p-4 sm:p-6 shadow-[0_20px_50px_rgba(15,23,42,0.06)] flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between mb-4">
                       <span className="font-bold text-slate-900 text-lg">Autonomous AI Exchange</span>
@@ -1150,7 +1115,7 @@ function VideoDashboardSection({ onOpenAudit }: { onOpenAudit: () => void }) {
                 </div>
 
                 {/* Right Latency Benchmark Box */}
-                <div className="lg:col-span-5 rounded-[20px] sm:rounded-[28px] bg-white border border-slate-100 p-5 sm:p-7 shadow-[0_20px_50px_rgba(15,23,42,0.06)] flex flex-col justify-between">
+                <div className="lg:col-span-5 rounded-[20px] bg-white border border-slate-100 p-4 sm:p-6 shadow-[0_20px_50px_rgba(15,23,42,0.06)] flex flex-col justify-between">
                   <div>
                     <span className="font-bold text-slate-900 text-lg block">Speed-to-Lead</span>
                     <span className="text-xs text-slate-500 font-normal mt-0.5 block">
@@ -1196,9 +1161,9 @@ function VideoDashboardSection({ onOpenAudit }: { onOpenAudit: () => void }) {
 
             {/* TAB 3: 04 QUALIFICATION & BOOKING */}
             {activeTab === 3 && (
-              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-stretch animate-in fade-in duration-300">
+              <div className="relative z-10 flex flex-col lg:grid lg:grid-cols-12 gap-4 items-stretch animate-in fade-in duration-300">
                 {/* Left Channel Attribution */}
-                <div className="lg:col-span-5 rounded-[20px] sm:rounded-[28px] bg-white border border-slate-100 p-5 sm:p-7 shadow-[0_20px_50px_rgba(15,23,42,0.06)] flex flex-col justify-between">
+                <div className="lg:col-span-5 rounded-[20px] bg-white border border-slate-100 p-4 sm:p-6 shadow-[0_20px_50px_rgba(15,23,42,0.06)] flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-bold text-slate-900 text-lg">Channel Distribution</span>
@@ -1246,7 +1211,7 @@ function VideoDashboardSection({ onOpenAudit }: { onOpenAudit: () => void }) {
                 </div>
 
                 {/* Right Confirmed Booking & CRM Sync */}
-                <div className="lg:col-span-7 rounded-[20px] sm:rounded-[28px] bg-white border border-slate-100 p-5 sm:p-7 shadow-[0_20px_50px_rgba(15,23,42,0.06)] flex flex-col justify-between">
+                <div className="lg:col-span-7 rounded-[20px] bg-white border border-slate-100 p-4 sm:p-6 shadow-[0_20px_50px_rgba(15,23,42,0.06)] flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between mb-4">
                       <span className="font-bold text-slate-900 text-lg">Confirmed Booking</span>
@@ -1462,8 +1427,68 @@ function AIGrowthSystemsPackages({
           </div>
         </div>
 
-        {/* Pricing 6: Three Cards with Highlighted Middle */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-7 items-stretch pt-4">
+        {/* Mobile: one card at a time — full width snap */}
+        <div className="lg:hidden overflow-x-auto snap-x snap-mandatory no-scrollbar -mx-6">
+          <div className="flex w-max px-6 gap-3">
+          {systems.map((sys, idx) => {
+            const setup = isIntl ? sys.intlSetup : sys.indiaSetup;
+            const monthly = isIntl ? sys.intlMonthly : sys.indiaMonthly;
+            const isPopular = sys.popular;
+            return (
+              <div
+                key={sys.id}
+                style={{ width: "calc(100vw - 48px)" }}
+                className={`snap-start snap-always shrink-0 rounded-3xl p-6 flex flex-col ${
+                  isPopular
+                    ? "bg-slate-950 text-white border-2 border-purple-500 shadow-xl"
+                    : "bg-white border border-slate-200"
+                }`}
+              >
+                {isPopular && (
+                  <div className="mb-3">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-purple-600 text-white">
+                      <Sparkles className="w-2.5 h-2.5" /> Most Popular
+                    </span>
+                  </div>
+                )}
+                <span className={`text-[10px] font-mono font-semibold ${isPopular ? "text-purple-400" : "text-slate-500"}`}>System {sys.systemNumber}</span>
+                <h3 className={`font-display text-xl font-bold mt-1 mb-2 ${isPopular ? "text-white" : "text-slate-900"}`}>{sys.name}</h3>
+                <p className={`text-xs mb-4 leading-relaxed ${isPopular ? "text-slate-400" : "text-slate-500"}`}>{sys.tagline}</p>
+                <div className={`p-3 rounded-xl mb-4 ${isPopular ? "bg-white/5 border border-white/10" : "bg-[#faf8f5] border border-slate-200"}`}>
+                  <span className={`font-display text-2xl font-extrabold ${isPopular ? "text-white" : "text-slate-900"}`}>{setup}</span>
+                  <span className={`text-[10px] font-mono ml-1 ${isPopular ? "text-slate-400" : "text-slate-500"}`}>setup</span>
+                  <span className={`text-xs font-mono font-bold block mt-0.5 ${isPopular ? "text-purple-400" : "text-purple-700"}`}>+ {monthly}</span>
+                </div>
+                <div className="space-y-2 flex-1">
+                  {sys.includes.map((item) => (
+                    <div key={item} className={`flex items-start gap-2 text-[11px] ${isPopular ? "text-slate-300" : "text-slate-600"}`}>
+                      <CheckCircle2 className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${isPopular ? "text-purple-400" : "text-purple-600"}`} />
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  onClick={() => onSelectPkg(sys.name, marketLabel)}
+                  className={`mt-5 w-full py-3 rounded-full text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer ${
+                    isPopular ? "bg-purple-600 hover:bg-purple-500 text-white" : "bg-slate-900 hover:bg-purple-600 text-white"
+                  }`}
+                >
+                  {sys.cta} <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            );
+          })}
+          </div>
+        </div>
+        {/* swipe hint dots */}
+        <div className="lg:hidden flex justify-center gap-1.5 mt-3">
+          {systems.map((_, i) => (
+            <span key={i} className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+          ))}
+        </div>
+
+        {/* Desktop: 3-col grid */}
+        <div className="hidden lg:grid grid-cols-3 gap-6 lg:gap-7 items-stretch pt-4">
           {systems.map((sys, idx) => {
             const setup = isIntl ? sys.intlSetup : sys.indiaSetup;
             const monthly = isIntl ? sys.intlMonthly : sys.indiaMonthly;
@@ -1608,6 +1633,7 @@ function AIGrowthSystemsPackages({
             );
           })}
         </div>
+        {/* end desktop grid */}
       </div>
     </section>
   );
@@ -1926,37 +1952,58 @@ function DeploymentProtocol({ onOpenAudit }: { onOpenAudit: () => void }) {
             </div>
           </div>
 
-          {/* Right Column: Zero-Gravity Folder Animation (Clean, No Clutter) */}
-          <div className="reveal-right lg:col-span-7 flex flex-col items-center justify-center relative min-h-[460px] overflow-visible py-10">
-            <FolderFloat
-              items={DELIVERABLES}
-              label="Buildicy Deployment Dossier"
-              sublabel="8 Core Architecture Modules"
-              trigger="hover"
-              physics={true}
-              drift={0.65}
-              closeOnSelect={false}
-              onSelect={handleSelectPill}
-              folderColor="#4c1d95"
-              frontColor="#7c3aed"
-              paperColor="#ffffff"
-              itemColor="#ffffff"
-              itemTextColor="#0f172a"
-              labelColor="#ffffff"
-              width={300}
-              height={200}
-              radius={18}
-              spread={230}
-              lift={44}
-              tilt={10}
-              bounce={0.32}
-            />
+          {/* Right Column: Folder on desktop, clean list on mobile */}
+          <div className="reveal-right lg:col-span-7 flex flex-col items-center justify-center relative overflow-hidden">
 
-            {selectedDeliverable && (
-              <div className="mt-8 px-4 py-1.5 rounded-full bg-white/95 backdrop-blur-sm border border-purple-200 text-xs font-mono text-purple-900 shadow-sm animate-in fade-in">
-                Active Module: <span className="font-bold">{selectedDeliverable}</span> (Calibrated & ready)
-              </div>
-            )}
+            {/* Mobile: clean numbered step list */}
+            <div className="lg:hidden w-full space-y-2">
+              {DELIVERABLES.map((item, i) => (
+                <div key={i} className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white border border-slate-200 text-xs font-mono text-slate-700">
+                  <span className="w-6 h-6 rounded-full bg-purple-50 border border-purple-200 text-purple-700 text-[10px] font-bold flex items-center justify-center shrink-0">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span>{item.replace(/^\d+ • /, "")}</span>
+                </div>
+              ))}
+              <button
+                onClick={onOpenAudit}
+                className="w-full mt-2 py-3 rounded-full bg-slate-900 hover:bg-purple-700 text-white text-xs font-semibold transition-all cursor-pointer"
+              >
+                Book a Free AI Growth Audit →
+              </button>
+            </div>
+
+            {/* Desktop: FolderFloat animation — contained in fixed height box */}
+            <div className="hidden lg:flex flex-col items-center justify-center w-full" style={{ height: 520 }}>
+              <FolderFloat
+                items={DELIVERABLES}
+                label="Buildicy Deployment Dossier"
+                sublabel="8 Core Architecture Modules"
+                trigger="hover"
+                physics={true}
+                drift={0.65}
+                closeOnSelect={false}
+                onSelect={handleSelectPill}
+                folderColor="#4c1d95"
+                frontColor="#7c3aed"
+                paperColor="#ffffff"
+                itemColor="#ffffff"
+                itemTextColor="#0f172a"
+                labelColor="#ffffff"
+                width={300}
+                height={200}
+                radius={18}
+                spread={220}
+                lift={44}
+                tilt={10}
+                bounce={0.32}
+              />
+              {selectedDeliverable && (
+                <div className="mt-6 px-4 py-1.5 rounded-full bg-white/95 backdrop-blur-sm border border-purple-200 text-xs font-mono text-purple-900 shadow-sm animate-in fade-in">
+                  Active: <span className="font-bold">{selectedDeliverable}</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
