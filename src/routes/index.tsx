@@ -516,6 +516,7 @@ function Index() {
         <RealEstateProofOfImpact onOpenAudit={() => handleOpenAudit()} />
         <BuildicyStudioSection onOpenAudit={() => handleOpenAudit("Buildicy Studio — Custom Build")} />
         <MinimalistFAQ onOpenAudit={() => handleOpenAudit()} />
+        <ResourcesSection />
         <FinalCTA onOpenAudit={() => handleOpenAudit()} />
       </main>
       <Footer onOpenAudit={() => handleOpenAudit()} />
@@ -2256,6 +2257,131 @@ function MinimalistFAQ({ onOpenAudit }: { onOpenAudit: () => void }) {
         </div>
       </div>
     </section>
+  );
+}
+
+/* =========================================================================
+   RESOURCES / DOCS DOWNLOAD SECTION
+   ========================================================================= */
+
+function ResourcesSection() {
+  const [previewing, setPreviewing] = useState<string | null>(null);
+
+  const docs = [
+    {
+      title: "AI Growth Systems Guide",
+      desc: "3 AI systems, deployment process & ROI benchmarks.",
+      file: "/Buildicy_AI_Growth_Systems_Guide new.pdf",
+      preview: "/Buildicy_AI_Growth_Systems_Guide new.pdf",
+      ext: "PDF",
+    },
+    {
+      title: "Company Profile",
+      desc: "Who we are, what we build, and global clients.",
+      file: "/Buildicy_Company_Profile_new.pdf",
+      preview: "/Buildicy_Company_Profile_new.pdf",
+      ext: "PDF",
+    },
+    {
+      title: "Product Engineering Guide",
+      desc: "Custom SaaS, MVPs & internal AI tools — scope & process.",
+      file: "/docs/Product_Engineering_Service_Guide.pdf",
+      preview: "/docs/Product_Engineering_Service_Guide.pdf",
+      ext: "PDF",
+    },
+  ];
+
+  return (
+    <>
+      <section className="px-6 py-12 md:px-12 bg-[#faf8f5] border-t border-slate-200">
+        <div className="mx-auto max-w-[1380px]">
+          <div className="reveal flex items-center justify-between mb-6">
+            <div>
+              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-purple-700">Free Resources</span>
+              <h2 className="font-display text-xl font-extrabold text-slate-900 mt-0.5">Download Our Guides</h2>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {docs.map((doc, i) => (
+              <div
+                key={doc.title}
+                className="reveal-zoom group flex items-center justify-between gap-4 px-5 py-4 rounded-2xl bg-white border border-slate-200 hover:border-purple-300 hover:shadow-sm transition-all duration-200"
+                style={{ transitionDelay: `${i * 70}ms` }}
+              >
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 border border-slate-200">
+                      {doc.ext}
+                    </span>
+                  </div>
+                  <p className="text-sm font-semibold text-slate-900 truncate">{doc.title}</p>
+                  <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">{doc.desc}</p>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  {doc.preview && (
+                    <button
+                      onClick={() => setPreviewing(doc.preview!)}
+                      className="w-8 h-8 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 hover:text-purple-600 hover:border-purple-300 transition-colors cursor-pointer"
+                      title="Preview"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                  <a
+                    href={doc.file}
+                    download
+                    className="w-8 h-8 rounded-xl bg-purple-600 flex items-center justify-center text-white hover:bg-purple-700 transition-colors cursor-pointer"
+                    title="Download"
+                  >
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* PDF Preview Modal */}
+      {previewing && (
+        <div
+          className="fixed inset-0 z-[9999] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200"
+          onClick={() => setPreviewing(null)}
+        >
+          <div
+            className="relative w-full max-w-3xl h-[85dvh] rounded-2xl overflow-hidden bg-white shadow-2xl flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-slate-50">
+              <span className="text-xs font-mono font-semibold text-slate-600">Preview</span>
+              <div className="flex items-center gap-2">
+                <a
+                  href={previewing}
+                  download
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-600 text-white text-xs font-semibold hover:bg-purple-700 transition-colors"
+                >
+                  <ArrowUpRight className="w-3 h-3" />
+                  Download PDF
+                </a>
+                <button
+                  onClick={() => setPreviewing(null)}
+                  className="w-7 h-7 rounded-full bg-slate-200 hover:bg-slate-300 flex items-center justify-center text-slate-600 cursor-pointer transition-colors"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+            <iframe
+              src={`${previewing}#toolbar=0`}
+              className="flex-1 w-full"
+              title="Document Preview"
+            />
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
