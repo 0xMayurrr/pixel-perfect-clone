@@ -808,42 +808,34 @@ function VideoDashboardSection({ onOpenAudit }: { onOpenAudit: () => void }) {
         {/* Dashboard Canvas Container (Ultra-Minimalist Light Aesthetic) */}
         <div className="reveal-scale rounded-3xl bg-white border border-slate-200/90 shadow-[0_24px_60px_-12px_rgba(15,23,42,0.08)] overflow-hidden" style={{ transitionDelay: "180ms" }}>
           {/* Top Window Bar */}
-          <div className="bg-slate-50/90 border-b border-slate-200 px-6 py-3.5 flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <div className="flex gap-1.5">
+          <div className="bg-slate-50/90 border-b border-slate-200 px-4 py-3 flex items-center justify-between gap-2 overflow-hidden">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="flex gap-1.5 shrink-0">
                 <span className="w-3 h-3 rounded-full bg-rose-400" />
                 <span className="w-3 h-3 rounded-full bg-amber-400" />
                 <span className="w-3 h-3 rounded-full bg-emerald-400" />
               </div>
-              <div className="h-4 w-px bg-slate-200 mx-1" />
-              <span className="font-mono text-xs font-semibold text-slate-700">
-                buildicy.engine / autonomous-pipeline-demo
+              <span className="font-mono text-[10px] sm:text-xs font-semibold text-slate-700 truncate">
+                buildicy.engine
               </span>
             </div>
 
-            <div className="flex items-center gap-3">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                Live Simulation
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Live
               </span>
-
-              {/* Play / Pause Toggle */}
+              <span className="sm:hidden w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <button
                 type="button"
                 onClick={() => setIsPlaying(!isPlaying)}
-                className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white border border-slate-200 text-xs font-mono text-slate-700 hover:text-slate-900 shadow-2xs cursor-pointer"
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-slate-200 text-[10px] sm:text-xs font-mono text-slate-700 hover:text-slate-900 shadow-2xs cursor-pointer"
                 title={isPlaying ? "Pause Auto-play" : "Resume Auto-play"}
               >
                 {isPlaying ? (
-                  <>
-                    <Pause className="w-3 h-3 text-slate-600" />
-                    <span>Pause</span>
-                  </>
+                  <><Pause className="w-3 h-3 text-slate-600" /><span>Pause</span></>
                 ) : (
-                  <>
-                    <Play className="w-3 h-3 text-purple-600" />
-                    <span className="text-purple-700 font-bold">Auto-Play</span>
-                  </>
+                  <><Play className="w-3 h-3 text-purple-600" /><span className="text-purple-700 font-bold">Play</span></>
                 )}
               </button>
             </div>
@@ -1429,9 +1421,9 @@ function AIGrowthSystemsPackages({
           </div>
         </div>
 
-        {/* Mobile: one card at a time — full width snap */}
-        <div className="lg:hidden overflow-x-auto snap-x snap-mandatory no-scrollbar -mx-6">
-          <div className="flex w-max px-6 gap-3">
+        {/* Mobile: one card at a time — true full width */}
+        <div className="lg:hidden -mx-6 overflow-x-auto snap-x snap-mandatory no-scrollbar">
+          <div className="flex px-6" style={{ gap: 0 }}>
           {systems.map((sys, idx) => {
             const setup = isIntl ? sys.intlSetup : sys.indiaSetup;
             const monthly = isIntl ? sys.intlMonthly : sys.indiaMonthly;
@@ -1439,12 +1431,12 @@ function AIGrowthSystemsPackages({
             return (
               <div
                 key={sys.id}
-                style={{ width: "calc(100vw - 48px)" }}
-                className={`snap-start snap-always shrink-0 rounded-3xl p-6 flex flex-col ${
+                className={`snap-start snap-always shrink-0 rounded-3xl p-6 flex flex-col mx-3 ${
                   isPopular
                     ? "bg-slate-950 text-white border-2 border-purple-500 shadow-xl"
                     : "bg-white border border-slate-200"
                 }`}
+                style={{ width: "calc(100vw - 72px)" }}
               >
                 {isPopular && (
                   <div className="mb-3">
@@ -1912,7 +1904,7 @@ function DeploymentProtocol({ onOpenAudit }: { onOpenAudit: () => void }) {
   return (
     <section
       id="protocol"
-      className="px-6 py-20 md:px-12 md:py-28 bg-[#faf8f5] text-slate-900 border-t border-slate-200"
+      className="px-6 py-20 md:px-12 md:py-28 bg-[#faf8f5] text-slate-900 border-t border-slate-200 overflow-hidden"
     >
       <div className="mx-auto max-w-[1380px]">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
@@ -1955,8 +1947,8 @@ function DeploymentProtocol({ onOpenAudit }: { onOpenAudit: () => void }) {
           </div>
 
           {/* Right Column: FolderFloat on all screen sizes */}
-          <div className="reveal-right lg:col-span-7 flex flex-col items-center justify-center relative overflow-hidden">
-            <div className="flex flex-col items-center justify-center w-full" style={{ height: 520 }}>
+          <div className="reveal-right lg:col-span-7 flex flex-col items-center justify-center relative">
+            <div className="flex flex-col items-center justify-center w-full overflow-hidden" style={{ height: 480 }}>
               <FolderFloat
                 items={DELIVERABLES}
                 label="Buildicy Deployment Dossier"
