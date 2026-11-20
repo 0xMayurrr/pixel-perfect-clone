@@ -784,21 +784,23 @@ function VideoDashboardSection({ onOpenAudit }: { onOpenAudit: () => void }) {
         </div>
 
         {/* Compact dot tab indicators */}
-        <div className="reveal flex items-center gap-2 mb-5" style={{ transitionDelay: "120ms" }}>
-          {STAGES.map((s) => {
-            const isActive = activeTab === s.id;
-            return (
-              <button
-                key={s.id}
-                onClick={() => handleSelectTab(s.id)}
-                title={s.label}
-                className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                  isActive ? "w-8 bg-purple-600" : "w-3 bg-slate-300 hover:bg-purple-300"
-                }`}
-              />
-            );
-          })}
-          <span className="ml-1 text-[11px] font-mono text-slate-400">
+        <div className="reveal flex flex-wrap items-center gap-2 mb-5" style={{ transitionDelay: "120ms" }}>
+          <div className="flex items-center gap-2">
+            {STAGES.map((s) => {
+              const isActive = activeTab === s.id;
+              return (
+                <button
+                  key={s.id}
+                  onClick={() => handleSelectTab(s.id)}
+                  title={s.label}
+                  className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                    isActive ? "w-8 bg-purple-600" : "w-3 bg-slate-300 hover:bg-purple-300"
+                  }`}
+                />
+              );
+            })}
+          </div>
+          <span className="text-[11px] font-mono text-slate-400">
             {STAGES[activeTab]?.label}
           </span>
         </div>
@@ -848,7 +850,7 @@ function VideoDashboardSection({ onOpenAudit }: { onOpenAudit: () => void }) {
           </div>
 
           {/* Interactive Dynamic Canvas */}
-          <div className="relative bg-gradient-to-br from-[#f0f4ff]/70 via-[#f8fafc] to-[#ffffff] p-4 sm:p-6 md:p-8 min-h-[420px] sm:min-h-[460px] flex flex-col justify-between overflow-hidden">
+          <div className="relative bg-gradient-to-br from-[#f0f4ff]/70 via-[#f8fafc] to-[#ffffff] p-4 sm:p-6 md:p-8 min-h-[380px] sm:min-h-[460px] flex flex-col justify-between overflow-hidden">
             {/* Soft Ambient Radial Blur Background */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-purple-200/25 rounded-full filter blur-3xl pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-200/20 rounded-full filter blur-3xl pointer-events-none" />
@@ -1933,7 +1935,7 @@ function DeploymentProtocol({ onOpenAudit }: { onOpenAudit: () => void }) {
             <div className="mt-8 flex items-center gap-3">
               <div className="inline-flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-purple-100/70 border border-purple-200 text-purple-900 shadow-sm">
                 <span className="text-xs font-mono font-bold tracking-tight">
-                  Hover or click the dossier
+                  Tap the dossier to open
                 </span>
                 <ArrowRight className="w-4 h-4 text-purple-700 animate-pulse" />
               </div>
@@ -1952,34 +1954,14 @@ function DeploymentProtocol({ onOpenAudit }: { onOpenAudit: () => void }) {
             </div>
           </div>
 
-          {/* Right Column: Folder on desktop, clean list on mobile */}
+          {/* Right Column: FolderFloat on all screen sizes */}
           <div className="reveal-right lg:col-span-7 flex flex-col items-center justify-center relative overflow-hidden">
-
-            {/* Mobile: clean numbered step list */}
-            <div className="lg:hidden w-full space-y-2">
-              {DELIVERABLES.map((item, i) => (
-                <div key={i} className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white border border-slate-200 text-xs font-mono text-slate-700">
-                  <span className="w-6 h-6 rounded-full bg-purple-50 border border-purple-200 text-purple-700 text-[10px] font-bold flex items-center justify-center shrink-0">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <span>{item.replace(/^\d+ • /, "")}</span>
-                </div>
-              ))}
-              <button
-                onClick={onOpenAudit}
-                className="w-full mt-2 py-3 rounded-full bg-slate-900 hover:bg-purple-700 text-white text-xs font-semibold transition-all cursor-pointer"
-              >
-                Book a Free AI Growth Audit →
-              </button>
-            </div>
-
-            {/* Desktop: FolderFloat animation — contained in fixed height box */}
-            <div className="hidden lg:flex flex-col items-center justify-center w-full" style={{ height: 520 }}>
+            <div className="flex flex-col items-center justify-center w-full" style={{ height: 520 }}>
               <FolderFloat
                 items={DELIVERABLES}
                 label="Buildicy Deployment Dossier"
                 sublabel="8 Core Architecture Modules"
-                trigger="hover"
+                trigger="click"
                 physics={true}
                 drift={0.65}
                 closeOnSelect={false}
@@ -1990,11 +1972,11 @@ function DeploymentProtocol({ onOpenAudit }: { onOpenAudit: () => void }) {
                 itemColor="#ffffff"
                 itemTextColor="#0f172a"
                 labelColor="#ffffff"
-                width={300}
-                height={200}
+                width={280}
+                height={190}
                 radius={18}
-                spread={220}
-                lift={44}
+                spread={180}
+                lift={40}
                 tilt={10}
                 bounce={0.32}
               />
