@@ -817,27 +817,24 @@ function VideoDashboardSection({ onOpenAudit }: { onOpenAudit: () => void }) {
           </p>
         </div>
 
-        {/* Minimalist Stage Navigation Tabs */}
-        <div className="reveal flex flex-wrap items-center gap-2 sm:gap-3 mb-6" style={{ transitionDelay: "120ms" }}>
-          <span className="text-xs font-mono font-semibold text-slate-400 uppercase tracking-wider mr-1 hidden sm:inline">
-            Workflow:
-          </span>
+        {/* Compact dot tab indicators */}
+        <div className="reveal flex items-center gap-2 mb-5" style={{ transitionDelay: "120ms" }}>
           {STAGES.map((s) => {
             const isActive = activeTab === s.id;
             return (
               <button
                 key={s.id}
                 onClick={() => handleSelectTab(s.id)}
-                className={`px-4 py-2 rounded-full text-xs font-mono font-semibold transition-all cursor-pointer ${
-                  isActive
-                    ? "bg-purple-600 text-white shadow-sm shadow-purple-600/30 scale-102"
-                    : "bg-white border border-slate-200 text-slate-600 hover:border-purple-300 hover:text-purple-700"
+                title={s.label}
+                className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                  isActive ? "w-8 bg-purple-600" : "w-3 bg-slate-300 hover:bg-purple-300"
                 }`}
-              >
-                {s.label}
-              </button>
+              />
             );
           })}
+          <span className="ml-1 text-[11px] font-mono text-slate-400">
+            {STAGES[activeTab]?.label}
+          </span>
         </div>
 
         {/* Dashboard Canvas Container (Ultra-Minimalist Light Aesthetic) */}
