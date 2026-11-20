@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import {
   ArrowRight,
@@ -34,10 +35,12 @@ import {
   Play,
   Pause,
   Maximize2,
+  X,
 } from "lucide-react";
 import { HeroTypewriter } from "../components/HeroTypewriter";
 import { AuditBookingModal } from "../components/AuditBookingModal";
 import FolderFloat from "../components/FolderFloat";
+import CircularCarousel from "../components/CircularCarousel";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -308,12 +311,12 @@ function WebGLParticleGlobe() {
           camera.position.set(0, 0, 310);
 
           const renderer = new THREE.WebGLRenderer({
-            antialias: !isMobile,
+            antialias: true,
             alpha: true,
             powerPreference: "high-performance",
           });
           renderer.setSize(width, height);
-          renderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio, 1.5));
+          renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2.5));
           renderer.setClearColor(0x000000, 0);
           container.appendChild(renderer.domElement);
 
@@ -374,10 +377,10 @@ function WebGLParticleGlobe() {
               if (countries?.features) {
                 globe
                   .hexPolygonsData(countries.features)
-                  .hexPolygonResolution(isMobile ? 2 : 3)
-                  .hexPolygonMargin(0.35)
-                  .hexPolygonAltitude(0.005)
-                  .hexPolygonColor(() => "rgba(255,255,255,0.92)");
+                  .hexPolygonResolution(3)
+                  .hexPolygonMargin(0.3)
+                  .hexPolygonAltitude(0.006)
+                  .hexPolygonColor(() => "rgba(255,255,255,0.96)");
               }
             })
             .catch(() => {});
@@ -435,6 +438,7 @@ function WebGLParticleGlobe() {
             camera.aspect = w / h;
             camera.updateProjectionMatrix();
             renderer.setSize(w, h);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2.5));
           };
           window.addEventListener("resize", handleResize);
 
@@ -469,7 +473,7 @@ function WebGLParticleGlobe() {
 
   return (
     <div className="relative flex items-center justify-center w-full h-full select-none touch-none">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(192,132,252,0.35)_0%,rgba(168,85,247,0.18)_55%,transparent_80%)] rounded-full filter blur-2xl pointer-events-none" />
+      <div className="absolute inset-4 bg-[radial-gradient(circle_at_center,rgba(168,85,247,0.18)_0%,rgba(147,51,234,0.06)_50%,transparent_75%)] rounded-full pointer-events-none" />
       <div
         ref={mountRef}
         className="relative z-10 w-full h-full cursor-grab active:cursor-grabbing touch-none"
@@ -481,8 +485,8 @@ function WebGLParticleGlobe() {
 function MobileHeroGlobe() {
   return (
     <div className="lg:hidden w-full flex justify-center mt-8 mb-2">
-      <div className="w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] relative">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(168,85,247,0.22)_0%,transparent_70%)] rounded-full" />
+      <div className="w-[300px] h-[300px] sm:w-[340px] sm:h-[340px] relative">
+        <div className="absolute inset-4 bg-[radial-gradient(circle_at_center,rgba(168,85,247,0.15)_0%,transparent_70%)] rounded-full pointer-events-none" />
         <WebGLParticleGlobe />
       </div>
     </div>
@@ -514,6 +518,7 @@ function Index() {
         <FollowUpBottleneck />
         <VideoDashboardSection onOpenAudit={() => handleOpenAudit()} />
         <AIGrowthSystemsPackages onSelectPkg={(pkg, market) => handleOpenAudit(pkg, market)} />
+        <FeaturedProjectsSection onOpenAudit={(pkgName) => handleOpenAudit(pkgName)} />
         <DeploymentProtocol onOpenAudit={() => handleOpenAudit()} />
         <RealEstateProofOfImpact onOpenAudit={() => handleOpenAudit()} />
         <BuildicyStudioSection onOpenAudit={() => handleOpenAudit("Buildicy Studio — Custom Build")} />
@@ -555,26 +560,20 @@ function Nav({ onOpenAudit }: { onOpenAudit: () => void }) {
           </div>
         </a>
         <nav
-          className="hidden gap-5 text-xs font-medium text-slate-700 lg:flex"
+          className="hidden gap-7 text-xs font-semibold text-slate-700 lg:flex items-center"
           aria-label="Primary"
         >
-          <a href="#problem" className="link-line hover:text-slate-900 transition-colors">
-            Follow-Up
-          </a>
           <a href="#dashboard" className="link-line hover:text-slate-900 transition-colors">
-            Autonomous Engine
+            Engine
           </a>
           <a href="#systems" className="link-line hover:text-slate-900 transition-colors">
-            AI Growth Systems
+            Systems
           </a>
-          <a href="#protocol" className="link-line hover:text-slate-900 transition-colors">
-            Protocol
+          <a href="#projects" className="link-line hover:text-slate-900 transition-colors">
+            Projects
           </a>
           <a href="#proof" className="link-line hover:text-slate-900 transition-colors">
-            Real Estate Proof
-          </a>
-          <a href="#studio" className="link-line hover:text-slate-900 transition-colors">
-            Buildicy Studio
+            Case Study
           </a>
           <Link to="/founders" className="link-line hover:text-purple-600 transition-colors">
             Founders
@@ -670,71 +669,91 @@ function Hero({ onOpenAudit }: { onOpenAudit: () => void }) {
 }
 
 /* =========================================================================
-   FOLLOW-UP BOTTLENECK (Clean, Minimalist, Architectural)
+   FOLLOW-UP BOTTLENECK (Clean, Minimalist Card Grid)
    ========================================================================= */
 
 function FollowUpBottleneck() {
   const problems = [
     {
-      title: "Slow response",
-      metric: "4+ hours delay",
-      desc: "Prospect buying intent peaks in the first 10 minutes. When replies take hours, deals go to the first vendor who responds.",
+      metric: "4+ Hours Delay",
+      title: "Slow Response",
+      desc: "Deals go to whoever answers first. Hours of delay sends warm buyers straight to competitors.",
+      icon: Clock,
     },
     {
-      title: "Missed calls & messages",
-      metric: "62% unanswered",
-      desc: "After-hours and weekend enquiries bounce into voicemails nobody checks, leaking high-intent revenue straight to competitors.",
+      metric: "62% Unanswered",
+      title: "Missed Enquiries",
+      desc: "After-hours and weekend inquiries bounce into voicemails nobody checks, leaking revenue 24/7.",
+      icon: PhoneCall,
     },
     {
-      title: "Unqualified leads",
-      metric: "70% wasted time",
-      desc: "Senior closers spend hours fielding low-budget tire-kickers instead of closing qualified buyers.",
+      metric: "70% Wasted Time",
+      title: "Unqualified Leads",
+      desc: "Closers waste hours manually screening tire-kickers instead of closing high-ticket buyers.",
+      icon: Users,
     },
     {
-      title: "No follow-up",
-      metric: "80% drop-off",
-      desc: "Most B2B contracts require 5+ touchpoints, yet 44% of sales reps abandon prospects after just one attempt.",
+      metric: "80% Drop-Off",
+      title: "Zero Follow-Up",
+      desc: "Contracts take 5+ touchpoints, yet most prospects are completely abandoned after one message.",
+      icon: TrendingUp,
     },
   ];
 
   return (
     <section
       id="problem"
-      className="px-6 py-20 md:px-12 md:py-28 bg-[#faf8f5] text-slate-900 border-t border-slate-200"
+      className="px-6 py-20 md:px-12 md:py-24 bg-[#faf8f5] text-slate-900 border-t border-slate-200"
     >
       <div className="mx-auto max-w-[1380px]">
-        <div className="reveal max-w-3xl mb-12">
-          <span className="font-mono text-xs font-bold uppercase tracking-wider text-purple-700 block mb-2">
-            The Follow-Up Bottleneck
-          </span>
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 leading-[1.12]">
+        {/* Minimalist Eyebrow & Headline */}
+        <div className="reveal max-w-3xl mb-10 sm:mb-12">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-purple-50 text-purple-700 border border-purple-200/80 mb-3.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse" />
+            THE REVENUE LEAK
+          </div>
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 leading-[1.15]">
             Most businesses do not have a lead problem.{" "}
-            <span className="text-slate-500 font-normal italic">
+            <span className="text-slate-400 font-normal italic">
               They have a follow-up problem.
             </span>
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {problems.map((p, idx) => (
-            <div
-              key={p.title}
-              className="reveal border-t border-slate-300 pt-5 flex flex-col justify-between group hover:border-purple-600 transition-colors duration-300"
-              style={{ transitionDelay: `${idx * 60}ms` }}
-            >
-              <div>
-                <span className="text-[11px] font-mono text-purple-700 font-semibold uppercase tracking-wider">
-                  {p.metric}
-                </span>
-                <h3 className="font-display text-xl font-bold text-slate-900 mt-2 mb-2 group-hover:text-purple-700 transition-colors">
-                  {p.title}
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
-                  {p.desc}
-                </p>
+        {/* 4 Clean Minimalist Problem Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+          {problems.map((p, idx) => {
+            const Icon = p.icon;
+            return (
+              <div
+                key={p.title}
+                className="reveal bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-7 border border-slate-200/90 shadow-xs hover:shadow-md hover:border-purple-300 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group"
+                style={{ transitionDelay: `${idx * 60}ms` }}
+              >
+                <div>
+                  {/* Top Metric Pill + Icon */}
+                  <div className="flex items-center justify-between mb-5">
+                    <span className="text-[11px] font-mono font-bold text-purple-700 bg-purple-50 border border-purple-100 px-2.5 py-1 rounded-lg uppercase tracking-wider">
+                      {p.metric}
+                    </span>
+                    <div className="w-8 h-8 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-purple-600 group-hover:bg-purple-50 group-hover:border-purple-100 transition-colors">
+                      <Icon className="w-4 h-4" />
+                    </div>
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="font-display text-lg sm:text-xl font-bold text-slate-900 group-hover:text-purple-900 transition-colors mb-2">
+                    {p.title}
+                  </h3>
+
+                  {/* Short Scannable Copy */}
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+                    {p.desc}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
@@ -760,18 +779,25 @@ function VideoDashboardSection({ onOpenAudit }: { onOpenAudit: () => void }) {
 
   useEffect(() => {
     if (!isPlaying) return;
+
+    const STAGE_DURATION = 5000; // 5 seconds per stage
+    const INTERVAL_MS = 40;
+    let elapsed = 0;
+
     const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          setActiveTab((cur) => (cur + 1) % STAGES.length);
-          return 0;
-        }
-        return prev + 1.25; // ~5.3s per stage
-      });
-    }, 60);
+      elapsed += INTERVAL_MS;
+      const pct = Math.min(100, (elapsed / STAGE_DURATION) * 100);
+      setProgress(pct);
+
+      if (elapsed >= STAGE_DURATION) {
+        clearInterval(interval);
+        setProgress(0);
+        setActiveTab((curr) => (curr + 1) % 4);
+      }
+    }, INTERVAL_MS);
 
     return () => clearInterval(interval);
-  }, [isPlaying, STAGES.length]);
+  }, [isPlaying, activeTab]);
 
   const handleSelectTab = (idx: number) => {
     setActiveTab(idx);
@@ -1326,7 +1352,7 @@ function VideoDashboardSection({ onOpenAudit }: { onOpenAudit: () => void }) {
 }
 
 /* =========================================================================
-   THE THREE AI GROWTH SYSTEMS (Our 3 Core Systems / Packages)
+   THE THREE AI GROWTH SYSTEMS (React Bits Pricing 6: Highlighted Middle)
    ========================================================================= */
 
 function AIGrowthSystemsPackages({
@@ -1342,71 +1368,58 @@ function AIGrowthSystemsPackages({
     {
       id: "ai-funnel",
       name: "AI Funnel System",
-      systemNumber: "System 01",
-      tagline: "Turn website enquiries into qualified booked calls.",
+      systemNumber: "01",
+      tagline: "Turn inbound website enquiries into qualified booked consultations.",
       popular: false,
       indiaSetup: "₹35,000",
       indiaMonthly: "₹7,000/mo",
       intlSetup: "$1,500",
       intlMonthly: "$400/mo",
-      bestFor: "Agencies, consultants, coaches with traffic but weak booking conversion.",
       includes: [
-        "Landing page architecture + lead form / chat intake",
-        "Qualification scoring questions calibrated to your ICP",
-        "Instant CRM capture & contact tagging",
-        "Direct calendar booking integration",
-        "Automated calendar reminders & basic follow-up",
+        "Landing page intake & lead form architecture",
+        "Custom ICP qualification scoring questions",
+        "Instant CRM contact tagging & sync",
+        "Direct calendar booking & automated reminders",
       ],
-      example:
-        "A consulting firm receives website enquiries; Buildicy qualifies them and offers a discovery-call booking slot.",
-      cta: "Get My Funnel Blueprint",
+      cta: "Get AI Funnel",
     },
     {
       id: "ai-concierge",
       name: "AI Lead Concierge",
-      systemNumber: "System 02",
-      tagline:
-        "Handle incoming enquiries and help suitable prospects book—even when your team is busy.",
+      systemNumber: "02",
+      tagline: "Autonomous 24/7 lead qualification and booking across WhatsApp & Web.",
       popular: true,
       indiaSetup: "₹65,000",
       indiaMonthly: "₹15,000/mo",
       intlSetup: "$3,000",
       intlMonthly: "$850/mo",
-      bestFor: "Businesses receiving enquiries through website chat, email, WhatsApp, or calls.",
       includes: [
         "Everything in AI Funnel System",
-        "Autonomous AI replies on WhatsApp, Web & Email",
-        "Conversational qualification, booking & painless rescheduling",
-        "Conversation summaries & instant human handover",
-        "Optional voice reception & missed-call SMS/WhatsApp auto-recovery",
+        "24/7 AI response on WhatsApp, Web & Email (< 18s)",
+        "Conversational ICP qualification & instant booking",
+        "Lead summaries & seamless human handover",
+        "Missed-call recovery via automated WhatsApp/SMS",
       ],
-      example:
-        "An after-hours WhatsApp enquiry gets answered using approved information, qualified, and offered a consultation slot.",
-      cta: "Book a System Demo",
+      cta: "Deploy AI Concierge",
     },
     {
       id: "growth-engine",
-      name: "Complete AI Growth Engine",
-      systemNumber: "System 03",
-      tagline:
-        "Connect your enquiries, follow-ups, sales team, and reporting in one managed system.",
+      name: "Complete Growth Engine",
+      systemNumber: "03",
+      tagline: "End-to-end sales pipeline automation, multi-rep routing, and reporting.",
       popular: false,
       indiaSetup: "₹1,25,000",
       indiaMonthly: "₹35,000/mo",
       intlSetup: "$5,500",
       intlMonthly: "$1,800/mo",
-      bestFor: "Established businesses with multiple lead sources and a sales team.",
       includes: [
         "Everything in AI Lead Concierge",
-        "Full CRM integration (HubSpot, GoHighLevel, Salesforce, custom)",
-        "Pipeline stages, lead routing & sales automation",
-        "Multi-touch no-show recovery & post-meeting follow-up",
+        "Full HubSpot / GHL / Salesforce 2-way sync",
+        "Automated closer routing & pipeline stages",
+        "Multi-touch no-show recovery sequences",
         "Executive owner dashboard & monthly optimization",
       ],
-      example:
-        "A marketing agency connects website, ads, and referral leads into one CRM, routes qualified leads to salespeople, and views pipeline in a dashboard.",
-      cta: "Book a Growth Audit",
-      note: "Advertising, outbound prospecting, and custom software are scoped separately.",
+      cta: "Deploy Full Engine",
     },
   ];
 
@@ -1416,133 +1429,188 @@ function AIGrowthSystemsPackages({
       className="px-6 py-20 md:px-12 md:py-28 bg-[#faf8f5] text-slate-900 border-t border-slate-200"
     >
       <div className="mx-auto max-w-[1380px]">
-        {/* Header */}
-        <div className="reveal text-center max-w-3xl mx-auto mb-12">
-          <span className="font-mono text-xs font-bold uppercase tracking-wider text-purple-700 block mb-2">
-            Buildicy Core Offer
-          </span>
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900">
-            The Three AI Growth Systems
+        {/* Minimalist Section Header */}
+        <div className="reveal text-center max-w-2xl mx-auto mb-12 sm:mb-14">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-purple-50 text-purple-700 border border-purple-200/80 mb-3.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse" />
+            CORE SYSTEMS
+          </div>
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 leading-[1.12]">
+            The Three AI Growth Systems.
           </h2>
           <p className="mt-3 text-slate-600 text-sm sm:text-base leading-relaxed">
-            Turn inbound traffic, WhatsApp, and calls into qualified booked calls. Choose
-            the system that fits your current operational volume.
+            Transparent pricing: Fixed one-time setup plus managed monthly optimization.
           </p>
 
-          {/* Currency Toggle */}
-          <div className="mt-5 flex justify-center">
-            <div className="inline-flex items-center gap-1 p-1 rounded-full bg-slate-200/80 border border-slate-300/80">
+          {/* Minimalist Currency Pill Toggle */}
+          <div className="mt-6 flex justify-center">
+            <div className="inline-flex items-center p-1 rounded-full bg-white border border-slate-200 shadow-2xs">
               <button
                 type="button"
                 onClick={() => setMarket("india")}
-                className={`px-4 py-1.5 rounded-full text-xs font-mono font-semibold transition-all cursor-pointer ${
-                  market === "india" ? "bg-purple-600 text-white shadow-xs" : "text-slate-600"
+                className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
+                  market === "india"
+                    ? "bg-purple-600 text-white shadow-xs font-semibold"
+                    : "text-slate-600 hover:text-slate-900"
                 }`}
               >
-                India — INR
+                India — INR (₹)
               </button>
               <button
                 type="button"
                 onClick={() => setMarket("intl")}
-                className={`px-4 py-1.5 rounded-full text-xs font-mono font-semibold transition-all cursor-pointer ${
-                  market === "intl" ? "bg-purple-600 text-white shadow-xs" : "text-slate-600"
+                className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
+                  market === "intl"
+                    ? "bg-purple-600 text-white shadow-xs font-semibold"
+                    : "text-slate-600 hover:text-slate-900"
                 }`}
               >
-                International — USD
+                International — USD ($)
               </button>
             </div>
           </div>
         </div>
 
-        {/* 3 Systems Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+        {/* Pricing 6: Three Cards with Highlighted Middle */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-7 items-stretch pt-4">
           {systems.map((sys, idx) => {
             const setup = isIntl ? sys.intlSetup : sys.indiaSetup;
             const monthly = isIntl ? sys.intlMonthly : sys.indiaMonthly;
             const isPopular = sys.popular;
 
+            if (isPopular) {
+              /* HIGHLIGHTED MIDDLE CARD (Centerpiece) */
+              return (
+                <div
+                  key={sys.id}
+                  className="reveal rounded-3xl p-7 sm:p-9 bg-slate-950 text-white border-2 border-purple-500 shadow-2xl shadow-purple-950/25 lg:-translate-y-4 relative flex flex-col justify-between transition-all duration-300"
+                  style={{ transitionDelay: `${idx * 70}ms` }}
+                >
+                  {/* Floating Highlight Badge */}
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                    <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-wider bg-purple-600 text-white shadow-md shadow-purple-600/30">
+                      <Sparkles className="w-3 h-3 text-purple-200" />
+                      <span>Most Popular</span>
+                    </span>
+                  </div>
+
+                  <div>
+                    {/* Header */}
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-mono font-semibold text-purple-400">
+                        System {sys.systemNumber}
+                      </span>
+                    </div>
+
+                    <h3 className="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                      {sys.name}
+                    </h3>
+
+                    <p className="text-xs sm:text-sm text-slate-400 mt-2 mb-6 leading-relaxed">
+                      {sys.tagline}
+                    </p>
+
+                    {/* Price Box */}
+                    <div className="mb-7 p-4 rounded-2xl bg-white/5 border border-white/10">
+                      <div className="flex items-baseline justify-between">
+                        <div>
+                          <span className="font-display text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+                            {setup}
+                          </span>
+                          <span className="text-xs text-slate-400 font-mono uppercase ml-1.5">
+                            Setup
+                          </span>
+                        </div>
+                        <div className="text-xs font-mono font-bold text-purple-400">
+                          + {monthly}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Features List */}
+                    <div className="space-y-3 mb-8">
+                      {sys.includes.map((item) => (
+                        <div key={item} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-300">
+                          <CheckCircle2 className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
+                          <span className="leading-snug">{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* CTA */}
+                  <div className="pt-4 border-t border-white/10">
+                    <button
+                      onClick={() => onSelectPkg(sys.name, marketLabel)}
+                      className="w-full py-4 rounded-full text-xs sm:text-sm font-semibold bg-purple-600 hover:bg-purple-500 text-white shadow-lg shadow-purple-600/30 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer group"
+                    >
+                      <span>{sys.cta}</span>
+                      <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                    </button>
+                  </div>
+                </div>
+              );
+            }
+
+            /* STANDARD TIER CARDS (Left & Right) */
             return (
               <div
                 key={sys.id}
-                className={`reveal rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 ${
-                  isPopular
-                    ? "bg-white border-2 border-purple-500 shadow-xl shadow-purple-600/10 lg:-translate-y-2"
-                    : "bg-white border border-slate-200 shadow-2xs hover:border-purple-300"
-                }`}
+                className="reveal rounded-3xl p-7 sm:p-9 bg-white text-slate-900 border border-slate-200 shadow-xs hover:border-purple-300 hover:shadow-md relative flex flex-col justify-between transition-all duration-300"
                 style={{ transitionDelay: `${idx * 70}ms` }}
               >
                 <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[11px] font-mono font-bold uppercase text-purple-700 bg-purple-50 px-2.5 py-0.5 rounded-full border border-purple-200">
-                      {sys.systemNumber}
+                  {/* Header */}
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-mono font-semibold text-slate-500">
+                      System {sys.systemNumber}
                     </span>
-                    {isPopular && (
-                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-purple-700 bg-purple-50 px-2.5 py-0.5 rounded-full border border-purple-200">
-                        ★ Most Popular
-                      </span>
-                    )}
                   </div>
 
-                  <h3 className="font-display text-2xl font-bold text-slate-900 mt-2">
+                  <h3 className="font-display text-2xl font-bold text-slate-900 tracking-tight">
                     {sys.name}
                   </h3>
 
-                  <p className="text-xs text-slate-700 font-medium my-3 leading-relaxed">
-                    “{sys.tagline}”
+                  <p className="text-xs sm:text-sm text-slate-600 mt-2 mb-6 leading-relaxed">
+                    {sys.tagline}
                   </p>
 
-                  <div className="my-4 p-4 rounded-2xl bg-[#faf8f5] border border-slate-200/80">
+                  {/* Price Box */}
+                  <div className="mb-7 p-4 rounded-2xl bg-[#faf8f5] border border-slate-200/80">
                     <div className="flex items-baseline justify-between">
                       <div>
-                        <span className="font-display text-3xl font-extrabold text-slate-900">
+                        <span className="font-display text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
                           {setup}
                         </span>
-                        <span className="text-[11px] font-mono text-slate-400 uppercase ml-1">
+                        <span className="text-xs text-slate-500 font-mono uppercase ml-1.5">
                           Setup
                         </span>
                       </div>
-                      <div className="text-xs font-mono text-purple-700 font-bold">
+                      <div className="text-xs font-mono font-bold text-purple-700">
                         + {monthly}
                       </div>
                     </div>
                   </div>
 
-                  <p className="text-xs text-slate-500 mb-4">{sys.bestFor}</p>
-
-                  <div className="space-y-2 mb-6">
+                  {/* Features List */}
+                  <div className="space-y-3 mb-8">
                     {sys.includes.map((item) => (
-                      <div key={item} className="flex items-start gap-2 text-xs text-slate-700">
-                        <span className="text-purple-600 font-bold">✓</span>
-                        <span>{item}</span>
+                      <div key={item} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-700">
+                        <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0 mt-0.5" />
+                        <span className="leading-snug">{item}</span>
                       </div>
                     ))}
                   </div>
-
-                  <div className="p-3 rounded-xl bg-purple-50/50 border border-purple-100 mb-4 text-xs text-slate-700 italic">
-                    <span className="font-bold text-purple-800 not-italic block mb-0.5 text-[10px] uppercase font-mono">
-                      Scenario Example
-                    </span>
-                    {sys.example}
-                  </div>
-
-                  {sys.note && (
-                    <p className="text-[11px] font-mono text-slate-400 italic mb-4">
-                      * {sys.note}
-                    </p>
-                  )}
                 </div>
 
+                {/* CTA */}
                 <div className="pt-4 border-t border-slate-100">
                   <button
                     onClick={() => onSelectPkg(sys.name, marketLabel)}
-                    className={`w-full py-3.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer ${
-                      isPopular
-                        ? "bg-purple-600 hover:bg-purple-700 text-white shadow-md shadow-purple-600/20"
-                        : "bg-slate-900 hover:bg-purple-600 text-white"
-                    }`}
+                    className="w-full py-3.5 rounded-full text-xs sm:text-sm font-semibold bg-slate-900 hover:bg-purple-600 text-white transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer group"
                   >
                     <span>{sys.cta}</span>
-                    <Arrow />
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                   </button>
                 </div>
               </div>
@@ -1550,6 +1618,249 @@ function AIGrowthSystemsPackages({
           })}
         </div>
       </div>
+    </section>
+  );
+}
+
+/* =========================================================================
+   FEATURED SYSTEMS & CLIENT WORK (3D Circular Carousel)
+   ========================================================================= */
+
+interface FeaturedProject {
+  id: string;
+  src: string;
+  alt: string;
+  title: string;
+  subtitle: string;
+  category: string;
+  badge: string;
+  year: string;
+  description: string;
+  outcome: string;
+}
+
+const FEATURED_PROJECTS: FeaturedProject[] = [
+  {
+    id: "growzo",
+    src: "/thumbnails/growzo.jpg",
+    alt: "GrowZO AI Voice Agent",
+    title: "GrowZO",
+    subtitle: "AI Voice & Cold Calling Agent",
+    category: "AI Voice",
+    badge: "Live Voice Agent",
+    year: "2025",
+    description: "Autonomous AI voice agent handling outbound calls, live qualification, and calendar booking 24/7.",
+    outcome: "10× outreach volume • −80% manual sales effort",
+  },
+  {
+    id: "bizbrain",
+    src: "/thumbnails/bizbrain.jpg",
+    alt: "BizBrain Autonomous CRM",
+    title: "BizBrain",
+    subtitle: "Autonomous Pipeline CRM",
+    category: "AI CRM",
+    badge: "Production CRM",
+    year: "2025",
+    description: "Centralized AI CRM unifying omnichannel inquiries, lead scoring, and automated deal pipeline routing.",
+    outcome: "−60% manual CRM work",
+  },
+  {
+    id: "markeee",
+    src: "/thumbnails/markeee.jpg",
+    alt: "Markeee Lead Funnel",
+    title: "Markeee",
+    subtitle: "Inbound Lead Qualification Funnel",
+    category: "Lead Inbound",
+    badge: "Inbound Engine",
+    year: "2025",
+    description: "Multi-channel inbound marketing and automated lead capture funnel converting visits to booked calls.",
+    outcome: "3× faster lead response",
+  },
+  {
+    id: "clientsync-os",
+    src: "/thumbnails/clientsync-os.jpg",
+    alt: "ClientSync Operations OS",
+    title: "ClientSync OS",
+    subtitle: "Client Onboarding & Operations OS",
+    category: "Operations",
+    badge: "Client OS",
+    year: "2024",
+    description: "Automated onboarding, project milestones, and client communication system eliminating operational bottlenecks.",
+    outcome: "−50% fragmented workflows",
+  },
+  {
+    id: "vibestay",
+    src: "/thumbnails/vibestay.jpg",
+    alt: "VibeStay Direct Booking Engine",
+    title: "VibeStay",
+    subtitle: "Direct Booking & Guest Engine",
+    category: "Hospitality",
+    badge: "Booking Platform",
+    year: "2025",
+    description: "High-conversion direct booking engine with instant room inventory reservation and guest messaging.",
+    outcome: "+65% direct booking engagement",
+  },
+  {
+    id: "tuition-os",
+    src: "/thumbnails/tuition-os.jpg",
+    alt: "Tuition OS Academy System",
+    title: "Tuition OS",
+    subtitle: "Academy Operations & Inquiries System",
+    category: "Education",
+    badge: "Academy SaaS",
+    year: "2024",
+    description: "Multi-branch platform automating student enrollment inquiries, attendance, and tuition collections.",
+    outcome: "−65% administrative manual workload",
+  },
+];
+
+function FeaturedProjectsSection({
+  onOpenAudit,
+}: {
+  onOpenAudit: (pkgName?: string) => void;
+}) {
+  const [selectedProject, setSelectedProject] = useState<FeaturedProject | null>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (!selectedProject) return;
+    const orig = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSelectedProject(null);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = orig;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedProject]);
+
+  return (
+    <section
+      id="projects"
+      className="px-6 py-16 md:px-12 md:py-24 bg-[#faf8f5] text-slate-900 border-t border-slate-200 overflow-hidden relative"
+    >
+      <div className="mx-auto max-w-[1380px]">
+        {/* Minimalist Section Header */}
+        <div className="reveal text-center max-w-xl mx-auto mb-6 sm:mb-8">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-purple-50 text-purple-700 border border-purple-200/80 mb-3">
+            <span className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse" />
+            CLIENT SYSTEMS
+          </div>
+          <h2 className="font-display text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
+            Systems We've Deployed.
+          </h2>
+          <p className="mt-2 text-slate-500 text-xs sm:text-sm">
+            Live AI agents and autonomous platforms built for real businesses.
+          </p>
+        </div>
+
+        {/* 3D Circular Carousel Container */}
+        <div className="w-full h-[500px] sm:h-[550px] md:h-[580px] relative overflow-hidden flex items-center justify-center select-none">
+          <CircularCarousel
+            items={FEATURED_PROJECTS}
+            preset="cylinder"
+            intro="rise"
+            cardWidth={260}
+            aspectRatio={1.35}
+            speed={11}
+            captions={true}
+            draggable={true}
+            fadeColor="#faf8f5"
+            innerShade={0.12}
+            onItemClick={(item) => setSelectedProject(item as FeaturedProject)}
+          />
+        </div>
+      </div>
+
+      {/* Case Preview Modal */}
+      {isClient &&
+        selectedProject &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-3.5 sm:p-6 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200"
+            onClick={() => setSelectedProject(null)}
+          >
+            <div
+              className="relative w-full max-w-lg max-h-[88dvh] overflow-y-auto rounded-3xl bg-white border border-slate-200 text-slate-900 shadow-2xl p-5 sm:p-7 no-scrollbar my-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                onClick={() => setSelectedProject(null)}
+                className="absolute top-4 right-4 sm:top-5 sm:right-5 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-colors cursor-pointer text-sm font-bold z-10"
+                aria-label="Close details"
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden bg-slate-100 mb-4 border border-slate-200">
+                <img
+                  src={selectedProject.src}
+                  alt={selectedProject.title}
+                  className="w-full h-full object-cover object-center"
+                />
+                <div className="absolute top-3 left-3 flex items-center gap-1.5 bg-slate-900/85 backdrop-blur-md text-white px-3 py-1 rounded-full text-xs font-mono">
+                  <span>{selectedProject.badge}</span>
+                  <span>•</span>
+                  <span>{selectedProject.year}</span>
+                </div>
+              </div>
+
+              <div className="mb-3">
+                <span className="text-[10px] font-mono font-bold text-purple-700 bg-purple-50 border border-purple-200 px-2.5 py-0.5 rounded-full uppercase tracking-wider inline-block mb-1.5">
+                  {selectedProject.category}
+                </span>
+                <h3 className="font-display text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                  {selectedProject.title}
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-600 mt-1.5 font-light leading-relaxed">
+                  {selectedProject.description}
+                </p>
+              </div>
+
+              <div className="my-3.5 p-3 rounded-2xl bg-[#faf8f5] border border-slate-200 flex items-center gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <div>
+                  <span className="text-[9px] font-mono uppercase tracking-wider text-slate-400 block font-semibold">
+                    Documented Studio Outcome
+                  </span>
+                  <span className="text-xs sm:text-sm font-mono font-bold text-slate-900">
+                    {selectedProject.outcome}
+                  </span>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row gap-2.5 mt-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const label = selectedProject.title;
+                    setSelectedProject(null);
+                    onOpenAudit(label);
+                  }}
+                  className="flex-1 rounded-full bg-purple-600 hover:bg-purple-700 py-3 text-xs sm:text-sm font-semibold text-white shadow-sm transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <span>Deploy System Like {selectedProject.title}</span>
+                  <ArrowUpRight className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedProject(null)}
+                  className="rounded-full bg-slate-100 hover:bg-slate-200 py-3 px-5 text-xs font-semibold text-slate-700 transition-colors cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
     </section>
   );
 }
@@ -1674,17 +1985,16 @@ function RealEstateProofOfImpact({ onOpenAudit }: { onOpenAudit: () => void }) {
       className="px-6 py-20 md:px-12 md:py-28 bg-[#faf8f5] text-slate-900 border-t border-slate-200"
     >
       <div className="mx-auto max-w-[1380px]">
-        {/* Header */}
+        {/* Header - Clean, Minimalist, Punchy */}
         <div className="reveal max-w-2xl mb-10">
           <span className="font-mono text-xs font-bold uppercase tracking-wider text-purple-700 block mb-2">
-            Industry Proof of Impact • Real Estate Case Study
+            • Real Estate Case Study
           </span>
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900">
-            Built for measurable lead recovery.
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 leading-[1.12]">
+            Before vs. After Buildicy.
           </h2>
           <p className="mt-3 text-slate-600 text-sm sm:text-base leading-relaxed">
-            How a high-ticket real estate firm transformed missed calls and slow WhatsApp
-            inquiries into 14 confirmed private viewings per month.
+            How a real estate brokerage converted missed calls and slow WhatsApp replies into 14 confirmed private viewings every month.
           </p>
         </div>
 
@@ -1695,7 +2005,7 @@ function RealEstateProofOfImpact({ onOpenAudit }: { onOpenAudit: () => void }) {
             <div>
               <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
                 <span className="text-xs font-mono uppercase tracking-wider text-rose-600 font-bold">
-                  Before Buildicy (Manual Follow-Up)
+                  Before Buildicy (Manual Delays)
                 </span>
                 <span className="w-6 h-6 rounded-full bg-rose-50 text-rose-600 font-bold text-xs flex items-center justify-center">
                   ✕
@@ -1736,7 +2046,7 @@ function RealEstateProofOfImpact({ onOpenAudit }: { onOpenAudit: () => void }) {
             </div>
 
             <div className="mt-6 pt-4 border-t border-slate-100 text-xs font-mono text-rose-700 font-medium">
-              Result: Estimated $35,000+ in lost monthly commission.
+              Result: Estimated $35,000+ in lost monthly property commissions.
             </div>
           </div>
 
@@ -1745,7 +2055,7 @@ function RealEstateProofOfImpact({ onOpenAudit }: { onOpenAudit: () => void }) {
             <div>
               <div className="flex items-center justify-between pb-4 mb-4 border-b border-purple-100">
                 <span className="text-xs font-mono uppercase tracking-wider text-purple-700 font-bold">
-                  After Buildicy (AI Growth System)
+                  After Buildicy (AI Lead Recovery)
                 </span>
                 <span className="w-6 h-6 rounded-full bg-purple-100 text-purple-700 font-bold text-xs flex items-center justify-center">
                   ✓
@@ -1786,7 +2096,7 @@ function RealEstateProofOfImpact({ onOpenAudit }: { onOpenAudit: () => void }) {
 
             <div className="mt-6 pt-4 border-t border-purple-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <span className="text-xs font-mono font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-                ★ Outcome: +14 qualified viewings booked/month
+                ★ Outcome: +14 Qualified Viewings / Month
               </span>
 
               <button
