@@ -160,30 +160,23 @@ function useReveal() {
           }
         });
       },
-      { threshold: 0.05, rootMargin: isMobile ? "0px" : "0px 0px -50px 0px" }
+      { threshold: 0.04, rootMargin: isMobile ? "0px" : "0px 0px -40px 0px" }
     );
+    const SELECTORS = [
+      ".reveal", ".reveal-zoom", ".reveal-left", ".reveal-right",
+      ".reveal-scale", ".reveal-blur", ".reveal-flip",
+    ].map((s) => `${s}:not(.is-in)`).join(", ");
     const observeAll = () => {
-      document
-        .querySelectorAll(
-          ".reveal:not(.is-in), .reveal-zoom:not(.is-in), .reveal-left:not(.is-in), .reveal-right:not(.is-in)"
-        )
-        .forEach((el) => observer.observe(el));
+      document.querySelectorAll(SELECTORS).forEach((el) => observer.observe(el));
     };
     observeAll();
     let moRaf: number | null = null;
     const mo = new MutationObserver(() => {
       if (moRaf) return;
-      moRaf = requestAnimationFrame(() => {
-        observeAll();
-        moRaf = null;
-      });
+      moRaf = requestAnimationFrame(() => { observeAll(); moRaf = null; });
     });
     mo.observe(document.body, { childList: true, subtree: true });
-    return () => {
-      observer.disconnect();
-      mo.disconnect();
-      if (moRaf) cancelAnimationFrame(moRaf);
-    };
+    return () => { observer.disconnect(); mo.disconnect(); if (moRaf) cancelAnimationFrame(moRaf); };
   }, []);
 }
 
@@ -612,7 +605,7 @@ function Hero({ onOpenAudit }: { onOpenAudit: () => void }) {
 
       <div className="relative z-10 mx-auto w-full max-w-[1400px] grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         {/* Left Column: Clean Headline with Typewriter, Subheadline & CTAs */}
-        <div className="lg:col-span-8 order-1 flex flex-col justify-center items-start text-left max-w-3xl pl-0 sm:pl-8 lg:pl-12 mt-4 lg:mt-16">
+        <div className="lg:col-span-8 order-1 flex flex-col justify-center items-start text-left max-w-3xl pl-0 sm:pl-8 lg:pl-12 mt-4 lg:mt-16 reveal-left">
           <h1 className="font-sans text-[clamp(2.2rem,5.4vw,5.2rem)] leading-[1.12] tracking-tight text-slate-900 font-extrabold text-left animate-in fade-in duration-500">
             Stop losing leads to{" "}
             <span className="inline-block text-purple-700 whitespace-nowrap align-bottom">
@@ -658,7 +651,7 @@ function Hero({ onOpenAudit }: { onOpenAudit: () => void }) {
         </div>
 
         {/* Right Column: WebGL Interactive Particle Globe */}
-        <div className="lg:col-span-4 order-2 hidden lg:flex items-center justify-center min-h-[480px] relative pointer-events-auto">
+        <div className="lg:col-span-4 order-2 hidden lg:flex items-center justify-center min-h-[480px] relative pointer-events-auto reveal-right">
           <div className="w-[340px] h-[340px] xl:w-[420px] xl:h-[420px] relative flex items-center justify-center">
             {isDesktop && <WebGLParticleGlobe />}
           </div>
@@ -707,7 +700,7 @@ function FollowUpBottleneck() {
     >
       <div className="mx-auto max-w-[1380px]">
         {/* Minimalist Eyebrow & Headline */}
-        <div className="reveal max-w-3xl mb-10 sm:mb-12">
+        <div className="reveal-blur max-w-3xl mb-10 sm:mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-purple-50 text-purple-700 border border-purple-200/80 mb-3.5">
             <span className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse" />
             THE REVENUE LEAK
@@ -727,8 +720,8 @@ function FollowUpBottleneck() {
             return (
               <div
                 key={p.title}
-                className="reveal bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-7 border border-slate-200/90 shadow-xs hover:shadow-md hover:border-purple-300 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group"
-                style={{ transitionDelay: `${idx * 60}ms` }}
+                className="reveal-zoom bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-7 border border-slate-200/90 shadow-xs hover:shadow-md hover:border-purple-300 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group"
+                style={{ transitionDelay: `${idx * 80}ms` }}
               >
                 <div>
                   {/* Top Metric Pill + Icon */}
@@ -811,7 +804,7 @@ function VideoDashboardSection({ onOpenAudit }: { onOpenAudit: () => void }) {
     >
       <div className="mx-auto max-w-[1380px]">
         {/* Section Header */}
-        <div className="reveal max-w-3xl mb-8">
+        <div className="reveal-left max-w-3xl mb-8">
           <span className="font-mono text-xs font-bold uppercase tracking-wider text-purple-700 block mb-2">
             The Autonomous Engine
           </span>
@@ -825,7 +818,7 @@ function VideoDashboardSection({ onOpenAudit }: { onOpenAudit: () => void }) {
         </div>
 
         {/* Minimalist Stage Navigation Tabs */}
-        <div className="reveal flex flex-wrap items-center gap-2 sm:gap-3 mb-6">
+        <div className="reveal flex flex-wrap items-center gap-2 sm:gap-3 mb-6" style={{ transitionDelay: "120ms" }}>
           <span className="text-xs font-mono font-semibold text-slate-400 uppercase tracking-wider mr-1 hidden sm:inline">
             Workflow:
           </span>
@@ -848,7 +841,7 @@ function VideoDashboardSection({ onOpenAudit }: { onOpenAudit: () => void }) {
         </div>
 
         {/* Dashboard Canvas Container (Ultra-Minimalist Light Aesthetic) */}
-        <div className="reveal-zoom rounded-3xl bg-white border border-slate-200/90 shadow-[0_24px_60px_-12px_rgba(15,23,42,0.08)] overflow-hidden">
+        <div className="reveal-scale rounded-3xl bg-white border border-slate-200/90 shadow-[0_24px_60px_-12px_rgba(15,23,42,0.08)] overflow-hidden" style={{ transitionDelay: "180ms" }}>
           {/* Top Window Bar */}
           <div className="bg-slate-50/90 border-b border-slate-200 px-6 py-3.5 flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
@@ -891,8 +884,8 @@ function VideoDashboardSection({ onOpenAudit }: { onOpenAudit: () => void }) {
             </div>
           </div>
 
-          {/* Interactive Dynamic Canvas (Style of reference frame_1.jpg, frame_3.jpg, frame_4.jpg) */}
-          <div className="relative bg-gradient-to-br from-[#f0f4ff]/70 via-[#f8fafc] to-[#ffffff] p-6 sm:p-10 min-h-[460px] flex flex-col justify-between overflow-hidden">
+          {/* Interactive Dynamic Canvas */}
+          <div className="relative bg-gradient-to-br from-[#f0f4ff]/70 via-[#f8fafc] to-[#ffffff] p-4 sm:p-6 md:p-10 min-h-[460px] flex flex-col justify-between overflow-hidden">
             {/* Soft Ambient Radial Blur Background */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-purple-200/25 rounded-full filter blur-3xl pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-200/20 rounded-full filter blur-3xl pointer-events-none" />
@@ -915,9 +908,9 @@ function VideoDashboardSection({ onOpenAudit }: { onOpenAudit: () => void }) {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
                   {/* Card 1 */}
-                  <div className="rounded-[24px] bg-white border border-slate-100 p-6 shadow-[0_16px_40px_-8px_rgba(15,23,42,0.06)] hover:border-purple-200 transition-all">
+                  <div className="rounded-[18px] sm:rounded-[24px] bg-white border border-slate-100 p-4 sm:p-6 shadow-[0_16px_40px_-8px_rgba(15,23,42,0.06)] hover:border-purple-200 transition-all">
                     <div className="flex items-center justify-between">
                       <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center font-bold text-sm">
                         $
@@ -940,7 +933,7 @@ function VideoDashboardSection({ onOpenAudit }: { onOpenAudit: () => void }) {
                   </div>
 
                   {/* Card 2 */}
-                  <div className="rounded-[24px] bg-white border border-slate-100 p-6 shadow-[0_16px_40px_-8px_rgba(15,23,42,0.06)] hover:border-purple-200 transition-all">
+                  <div className="rounded-[18px] sm:rounded-[24px] bg-white border border-slate-100 p-4 sm:p-6 shadow-[0_16px_40px_-8px_rgba(15,23,42,0.06)] hover:border-purple-200 transition-all">
                     <div className="flex items-center justify-between">
                       <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-sm">
                         <Users className="w-4 h-4" />
@@ -962,7 +955,7 @@ function VideoDashboardSection({ onOpenAudit }: { onOpenAudit: () => void }) {
                   </div>
 
                   {/* Card 3 */}
-                  <div className="rounded-[24px] bg-white border border-slate-100 p-6 shadow-[0_16px_40px_-8px_rgba(15,23,42,0.06)] hover:border-purple-200 transition-all">
+                  <div className="rounded-[18px] sm:rounded-[24px] bg-white border border-slate-100 p-4 sm:p-6 shadow-[0_16px_40px_-8px_rgba(15,23,42,0.06)] hover:border-purple-200 transition-all">
                     <div className="flex items-center justify-between">
                       <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-sm">
                         <Clock className="w-4 h-4" />
@@ -984,7 +977,7 @@ function VideoDashboardSection({ onOpenAudit }: { onOpenAudit: () => void }) {
                   </div>
 
                   {/* Card 4 */}
-                  <div className="rounded-[24px] bg-white border border-slate-100 p-6 shadow-[0_16px_40px_-8px_rgba(15,23,42,0.06)] hover:border-purple-200 transition-all">
+                  <div className="rounded-[18px] sm:rounded-[24px] bg-white border border-slate-100 p-4 sm:p-6 shadow-[0_16px_40px_-8px_rgba(15,23,42,0.06)] hover:border-purple-200 transition-all">
                     <div className="flex items-center justify-between">
                       <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center font-bold text-sm">
                         <Calendar className="w-4 h-4" />
@@ -1008,11 +1001,11 @@ function VideoDashboardSection({ onOpenAudit }: { onOpenAudit: () => void }) {
               </div>
             )}
 
-            {/* TAB 1: 02 OMNICHANNEL STREAM (Style of frame_4.jpg) */}
+            {/* TAB 1: 02 OMNICHANNEL STREAM */}
             {activeTab === 1 && (
-              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch animate-in fade-in duration-300">
+              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-stretch animate-in fade-in duration-300">
                 {/* Left Live Volume Box */}
-                <div className="lg:col-span-5 rounded-[28px] bg-white border border-slate-100 p-7 shadow-[0_20px_50px_rgba(15,23,42,0.06)] flex flex-col justify-between">
+                <div className="lg:col-span-5 rounded-[20px] sm:rounded-[28px] bg-white border border-slate-100 p-5 sm:p-7 shadow-[0_20px_50px_rgba(15,23,42,0.06)] flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-slate-900 text-lg">Active Enquiries</span>
@@ -1044,7 +1037,7 @@ function VideoDashboardSection({ onOpenAudit }: { onOpenAudit: () => void }) {
                 </div>
 
                 {/* Right Live Activity Feed */}
-                <div className="lg:col-span-7 rounded-[28px] bg-white border border-slate-100 p-7 shadow-[0_20px_50px_rgba(15,23,42,0.06)]">
+                <div className="lg:col-span-7 rounded-[20px] sm:rounded-[28px] bg-white border border-slate-100 p-5 sm:p-7 shadow-[0_20px_50px_rgba(15,23,42,0.06)]">
                   <div className="flex items-center justify-between mb-5">
                     <span className="font-bold text-slate-900 text-lg">Live Inbound Activity</span>
                     <span className="text-xs font-mono text-purple-700 font-semibold">Sub-30s Triage</span>
@@ -1115,11 +1108,11 @@ function VideoDashboardSection({ onOpenAudit }: { onOpenAudit: () => void }) {
               </div>
             )}
 
-            {/* TAB 2: 03 SUB-MINUTE TRIAGE (Chat & Speed-to-Lead) */}
+            {/* TAB 2: 03 SUB-MINUTE TRIAGE */}
             {activeTab === 2 && (
-              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch animate-in fade-in duration-300">
+              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-stretch animate-in fade-in duration-300">
                 {/* Left Conversational AI Box */}
-                <div className="lg:col-span-7 rounded-[28px] bg-white border border-slate-100 p-7 shadow-[0_20px_50px_rgba(15,23,42,0.06)] flex flex-col justify-between">
+                <div className="lg:col-span-7 rounded-[20px] sm:rounded-[28px] bg-white border border-slate-100 p-5 sm:p-7 shadow-[0_20px_50px_rgba(15,23,42,0.06)] flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between mb-4">
                       <span className="font-bold text-slate-900 text-lg">Autonomous AI Exchange</span>
@@ -1159,7 +1152,7 @@ function VideoDashboardSection({ onOpenAudit }: { onOpenAudit: () => void }) {
                 </div>
 
                 {/* Right Latency Benchmark Box */}
-                <div className="lg:col-span-5 rounded-[28px] bg-white border border-slate-100 p-7 shadow-[0_20px_50px_rgba(15,23,42,0.06)] flex flex-col justify-between">
+                <div className="lg:col-span-5 rounded-[20px] sm:rounded-[28px] bg-white border border-slate-100 p-5 sm:p-7 shadow-[0_20px_50px_rgba(15,23,42,0.06)] flex flex-col justify-between">
                   <div>
                     <span className="font-bold text-slate-900 text-lg block">Speed-to-Lead</span>
                     <span className="text-xs text-slate-500 font-normal mt-0.5 block">
@@ -1203,11 +1196,11 @@ function VideoDashboardSection({ onOpenAudit }: { onOpenAudit: () => void }) {
               </div>
             )}
 
-            {/* TAB 3: 04 QUALIFICATION & BOOKING (Style of frame_3.jpg) */}
+            {/* TAB 3: 04 QUALIFICATION & BOOKING */}
             {activeTab === 3 && (
-              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch animate-in fade-in duration-300">
-                {/* Left Channel Attribution (Donut breakdown) */}
-                <div className="lg:col-span-5 rounded-[28px] bg-white border border-slate-100 p-7 shadow-[0_20px_50px_rgba(15,23,42,0.06)] flex flex-col justify-between">
+              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-stretch animate-in fade-in duration-300">
+                {/* Left Channel Attribution */}
+                <div className="lg:col-span-5 rounded-[20px] sm:rounded-[28px] bg-white border border-slate-100 p-5 sm:p-7 shadow-[0_20px_50px_rgba(15,23,42,0.06)] flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-bold text-slate-900 text-lg">Channel Distribution</span>
@@ -1255,7 +1248,7 @@ function VideoDashboardSection({ onOpenAudit }: { onOpenAudit: () => void }) {
                 </div>
 
                 {/* Right Confirmed Booking & CRM Sync */}
-                <div className="lg:col-span-7 rounded-[28px] bg-white border border-slate-100 p-7 shadow-[0_20px_50px_rgba(15,23,42,0.06)] flex flex-col justify-between">
+                <div className="lg:col-span-7 rounded-[20px] sm:rounded-[28px] bg-white border border-slate-100 p-5 sm:p-7 shadow-[0_20px_50px_rgba(15,23,42,0.06)] flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between mb-4">
                       <span className="font-bold text-slate-900 text-lg">Confirmed Booking</span>
@@ -1330,7 +1323,7 @@ function VideoDashboardSection({ onOpenAudit }: { onOpenAudit: () => void }) {
         </div>
 
         {/* Minimalist CTA Below Dashboard */}
-        <div className="reveal mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 p-6 rounded-2xl bg-white border border-slate-200 shadow-xs">
+        <div className="reveal-flip mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 p-6 rounded-2xl bg-white border border-slate-200 shadow-xs" style={{ transitionDelay: "200ms" }}>
           <div>
             <div className="font-display text-lg font-bold text-slate-900">
               Want this autonomous engine installed into your business?
@@ -1430,7 +1423,7 @@ function AIGrowthSystemsPackages({
     >
       <div className="mx-auto max-w-[1380px]">
         {/* Minimalist Section Header */}
-        <div className="reveal text-center max-w-2xl mx-auto mb-12 sm:mb-14">
+        <div className="reveal-blur text-center max-w-2xl mx-auto mb-12 sm:mb-14">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-purple-50 text-purple-700 border border-purple-200/80 mb-3.5">
             <span className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse" />
             CORE SYSTEMS
@@ -1483,8 +1476,8 @@ function AIGrowthSystemsPackages({
               return (
                 <div
                   key={sys.id}
-                  className="reveal rounded-3xl p-7 sm:p-9 bg-slate-950 text-white border-2 border-purple-500 shadow-2xl shadow-purple-950/25 lg:-translate-y-4 relative flex flex-col justify-between transition-all duration-300"
-                  style={{ transitionDelay: `${idx * 70}ms` }}
+                  className="reveal-zoom rounded-3xl p-7 sm:p-9 bg-slate-950 text-white border-2 border-purple-500 shadow-2xl shadow-purple-950/25 lg:-translate-y-4 relative flex flex-col justify-between transition-all duration-300"
+                  style={{ transitionDelay: `${idx * 100}ms` }}
                 >
                   {/* Floating Highlight Badge */}
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
@@ -1556,8 +1549,8 @@ function AIGrowthSystemsPackages({
             return (
               <div
                 key={sys.id}
-                className="reveal rounded-3xl p-7 sm:p-9 bg-white text-slate-900 border border-slate-200 shadow-xs hover:border-purple-300 hover:shadow-md relative flex flex-col justify-between transition-all duration-300"
-                style={{ transitionDelay: `${idx * 70}ms` }}
+                className="reveal-scale rounded-3xl p-7 sm:p-9 bg-white text-slate-900 border border-slate-200 shadow-xs hover:border-purple-300 hover:shadow-md relative flex flex-col justify-between transition-all duration-300"
+                style={{ transitionDelay: `${idx * 100}ms` }}
               >
                 <div>
                   {/* Header */}
@@ -1747,7 +1740,7 @@ function FeaturedProjectsSection({
     >
       <div className="mx-auto max-w-[1380px]">
         {/* Minimalist Section Header */}
-        <div className="reveal text-center max-w-xl mx-auto mb-6 sm:mb-8">
+        <div className="reveal-blur text-center max-w-xl mx-auto mb-6 sm:mb-8">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-purple-50 text-purple-700 border border-purple-200/80 mb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse" />
             CLIENT SYSTEMS
@@ -1986,7 +1979,7 @@ function RealEstateProofOfImpact({ onOpenAudit }: { onOpenAudit: () => void }) {
     >
       <div className="mx-auto max-w-[1380px]">
         {/* Header - Clean, Minimalist, Punchy */}
-        <div className="reveal max-w-2xl mb-10">
+        <div className="reveal-left max-w-2xl mb-10">
           <span className="font-mono text-xs font-bold uppercase tracking-wider text-purple-700 block mb-2">
             • Real Estate Case Study
           </span>
@@ -1999,9 +1992,9 @@ function RealEstateProofOfImpact({ onOpenAudit }: { onOpenAudit: () => void }) {
         </div>
 
         {/* Side-by-side Before (✕) vs After (✓) */}
-        <div className="reveal grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
           {/* Before Buildicy (✕) */}
-          <div className="rounded-3xl p-6 sm:p-8 bg-white border border-slate-200 shadow-2xs flex flex-col justify-between">
+          <div className="reveal-left rounded-3xl p-6 sm:p-8 bg-white border border-slate-200 shadow-2xs flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
                 <span className="text-xs font-mono uppercase tracking-wider text-rose-600 font-bold">
@@ -2051,7 +2044,7 @@ function RealEstateProofOfImpact({ onOpenAudit }: { onOpenAudit: () => void }) {
           </div>
 
           {/* After Buildicy (✓) */}
-          <div className="rounded-3xl p-6 sm:p-8 bg-white border-2 border-purple-500 shadow-xl shadow-purple-600/10 flex flex-col justify-between">
+          <div className="reveal-right rounded-3xl p-6 sm:p-8 bg-white border-2 border-purple-500 shadow-xl shadow-purple-600/10 flex flex-col justify-between" style={{ transitionDelay: "100ms" }}>
             <div>
               <div className="flex items-center justify-between pb-4 mb-4 border-b border-purple-100">
                 <span className="text-xs font-mono uppercase tracking-wider text-purple-700 font-bold">
@@ -2149,7 +2142,7 @@ function BuildicyStudioSection({ onOpenAudit }: { onOpenAudit: () => void }) {
     >
       <div className="mx-auto max-w-[1380px]">
         {/* Header */}
-        <div className="reveal flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+        <div className="reveal-blur flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div className="max-w-2xl">
             <span className="font-mono text-xs font-bold uppercase tracking-wider text-purple-700 block mb-2">
               Custom Engineering Division
@@ -2176,8 +2169,8 @@ function BuildicyStudioSection({ onOpenAudit }: { onOpenAudit: () => void }) {
           {capabilities.map((cap, i) => (
             <div
               key={cap.title}
-              className="reveal rounded-3xl p-6 bg-white border border-slate-200 shadow-2xs hover:border-purple-300 hover:shadow-lg transition-all duration-300"
-              style={{ transitionDelay: `${i * 60}ms` }}
+              className="reveal-zoom rounded-3xl p-6 bg-white border border-slate-200 shadow-2xs hover:border-purple-300 hover:shadow-lg transition-all duration-300"
+              style={{ transitionDelay: `${i * 90}ms` }}
             >
               <div className="w-10 h-10 rounded-2xl bg-purple-50 flex items-center justify-center mb-4">
                 {cap.icon}
@@ -2234,7 +2227,7 @@ function MinimalistFAQ({ onOpenAudit }: { onOpenAudit: () => void }) {
       className="px-6 py-20 md:px-12 md:py-28 bg-[#faf8f5] text-slate-900 border-t border-slate-200"
     >
       <div className="mx-auto max-w-[900px]">
-        <div className="reveal text-center mb-10">
+        <div className="reveal-blur text-center mb-10">
           <span className="font-mono text-xs font-bold uppercase tracking-wider text-purple-700 block mb-2">
             FAQ
           </span>
